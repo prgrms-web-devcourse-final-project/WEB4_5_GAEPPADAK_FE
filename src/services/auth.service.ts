@@ -74,6 +74,31 @@ class AuthService {
       throw e;
     }
   }
+
+  async checkEmailReset(body: IAuth.CheckEmailDto): Promise<void> {
+    try {
+      await axiosInstance.post<
+        ApiResponse<void>,
+        AxiosResponse<ApiResponse<void>>,
+        IAuth.CheckEmailDto
+      >("api/v1/auth/check-email-reset", body);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  async resetPassword(body: IAuth.ResetPasswordDto): Promise<void> {
+    try {
+      await axiosInstance.patch<ApiResponse<void>>(
+        "api/v1/members/password",
+        body
+      );
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 export const authService = new AuthService();

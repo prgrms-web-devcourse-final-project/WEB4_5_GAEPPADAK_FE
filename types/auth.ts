@@ -54,4 +54,10 @@ export namespace IAuth {
 
     authCode!: string;
   }
+
+  export class ResetPasswordDto {
+    email!: string;
+
+    newPassword!: string;
+  }
 }
