@@ -11,6 +11,8 @@ import { commentService } from "@/src/services/comment.service";
 import { IComment } from "@/types/comment";
 import { newsService } from "@/src/services/news.service";
 import { videoService } from "@/src/services/video.service";
+import NewsCard from "@src/components/cards/NewsCard";
+import VideoCard from "@src/components/cards/VideoCard";
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -388,92 +390,107 @@ export default function PostDetailPage() {
       </div>
 
       {/* 뉴스 추천 섹션 */}
-      {news.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            뉴스 추천
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {news.map((newsItem) => (
-              <Link
-                key={newsItem.id}
-                href={`/news/${newsItem.id}`}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mx-auto mb-2 relative">
-                  {newsItem.thumbnailUrl ? (
-                    <Image
-                      src={newsItem.thumbnailUrl}
-                      alt={newsItem.title}
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24">
-                        <Image
-                          src="/placeholder.jpg"
-                          alt="썸네일"
-                          width={100}
-                          height={75}
-                          className="object-contain"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white text-center mb-2 line-clamp-2">
-                  {newsItem.title}
-                </p>
-              </Link>
-            ))}
-          </div>
+      <section className="mt-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            관련 뉴스
+          </h2>
         </div>
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {news.length > 0 ? (
+            news.slice(0, 5).map((newsItem, index) => (
+              <NewsCard
+                key={index}
+                news={{
+                  newsId: newsItem.id,
+                  title: newsItem.title,
+                  url: newsItem.url || "#",
+                  thumbnailUrl: newsItem.thumbnailUrl,
+                  publishedAt: "",
+                  summary: "",
+                  platform: newsItem.platform,
+                }}
+              />
+            ))
+          ) : (
+            <div className="col-span-full">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-10 text-center border border-gray-100 dark:border-gray-700">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 8l-7 7-7-7"
+                  />
+                </svg>
+                <p className="text-lg text-gray-600 dark:text-gray-300 font-medium">
+                  관련 뉴스가 없습니다.
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  이 포스트와 관련된 뉴스 콘텐츠를 찾을 수 없습니다.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* 유튜브 추천 섹션 */}
-      {videos.length > 0 && (
-        <div className="mt-8 mb-10">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            유튜브 추천
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {videos.map((video) => (
-              <Link
-                key={video.id}
-                href={video.url}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mx-auto mb-2 relative">
-                  {video.thumbnailUrl ? (
-                    <Image
-                      src={video.thumbnailUrl}
-                      alt={video.title}
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24">
-                        <Image
-                          src="/placeholder.jpg"
-                          alt="썸네일"
-                          width={100}
-                          height={75}
-                          className="object-contain"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white text-center mb-2 line-clamp-2">
-                  {video.title}
-                </p>
-              </Link>
-            ))}
-          </div>
+      <section className="mt-8 mb-10">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            관련 유튜브
+          </h2>
         </div>
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {videos.length > 0 ? (
+            videos.slice(0, 5).map((video, index) => (
+              <VideoCard
+                key={index}
+                video={{
+                  videoId: video.id,
+                  title: video.title,
+                  url: video.url || "#",
+                  thumbnailUrl: video.thumbnailUrl,
+                  publishedAt: "",
+                  platform: "YOUTUBE",
+                }}
+              />
+            ))
+          ) : (
+            <div className="col-span-full">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-10 text-center border border-gray-100 dark:border-gray-700">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                <p className="text-lg text-gray-600 dark:text-gray-300 font-medium">
+                  관련 유튜브가 없습니다.
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  이 포스트와 관련된 유튜브 콘텐츠를 찾을 수 없습니다.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
