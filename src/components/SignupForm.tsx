@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "@src/services/auth.service";
+import { AxiosError } from "axios";
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -111,7 +112,11 @@ const SignupForm: React.FC = () => {
       // 회원가입 성공 후 이메일 인증 페이지로 리다이렉트
       router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     } catch (err) {
-      setError("회원가입에 실패했습니다. 다시 시도해주세요.");
+      if (err instanceof AxiosError && err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
       console.error(err);
     } finally {
       setLoading(false);
