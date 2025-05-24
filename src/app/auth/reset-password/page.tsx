@@ -16,6 +16,7 @@ const ResetPasswordPage = () => {
   const [timeLeft, setTimeLeft] = useState<number>(300);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
@@ -121,7 +122,11 @@ const ResetPasswordPage = () => {
       await authService.sendEmailAuth(email);
       setSuccess("인증 코드가 발송되었습니다.");
       setTimeLeft(300);
-      setTimeout(() => setStep(2), 1000);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setStep(2);
+        setIsTransitioning(false);
+      }, 1500);
     } catch (error) {
       if (error instanceof AxiosError && error.response?.data?.message) {
         setError(error.response.data.message);
@@ -156,7 +161,11 @@ const ResetPasswordPage = () => {
         authCode: verificationCode,
       });
       setSuccess("인증이 완료되었습니다.");
-      setTimeout(() => setStep(3), 1000);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setStep(3);
+        setIsTransitioning(false);
+      }, 1500);
     } catch (error) {
       if (error instanceof AxiosError && error.response?.data?.message) {
         setError(error.response.data.message);
@@ -198,6 +207,7 @@ const ResetPasswordPage = () => {
         newPassword,
       });
       setSuccess("비밀번호가 성공적으로 변경되었습니다.");
+      setIsTransitioning(true);
       setTimeout(() => {
         router.push("/auth/signin");
       }, 2000);
@@ -237,6 +247,88 @@ const ResetPasswordPage = () => {
         return "";
     }
   };
+
+  const getTransitionMessage = () => {
+    switch (step) {
+      case 1:
+        return "인증 코드 발송 완료!\n이메일 인증 단계로 이동 중...";
+      case 2:
+        return "이메일 인증 완료!\n비밀번호 설정 단계로 이동 중...";
+      case 3:
+        return "비밀번호 변경 완료!\n로그인 페이지로 이동 중...";
+      default:
+        return "이동 중...";
+    }
+  };
+
+  // 전환 중일 때 로딩 화면 표시
+  if (isTransitioning) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
+            <div className="text-center">
+              <div className="mx-auto w-48 h-48 relative mb-8 rounded-full overflow-hidden bg-white shadow flex items-center justify-center">
+                <div className="relative w-36 h-36">
+                  <Image
+                    src="/kkokkio.png"
+                    alt="로고"
+                    layout="fill"
+                    objectFit="contain"
+                    priority
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center">
+                <svg
+                  className="animate-spin h-12 w-12 text-indigo-600 mb-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+
+                <div className="text-center">
+                  {getTransitionMessage()
+                    .split("\n")
+                    .map((line, index) => (
+                      <p
+                        key={index}
+                        className={
+                          index === 0
+                            ? "text-2xl font-bold text-gray-900 dark:text-white mb-2"
+                            : "text-gray-600 dark:text-gray-400 mb-4"
+                        }
+                      >
+                        {line}
+                      </p>
+                    ))}
+                </div>
+
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
