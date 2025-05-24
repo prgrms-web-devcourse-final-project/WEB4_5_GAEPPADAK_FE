@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { postService } from "@src/services/post.service";
-import { INews, IPost, IVideo } from "@/types";
+import { INews, IPost, IVideo, IMember } from "@/types";
 import LoadingSpinner from "@src/components/ui/LoadingSpinner";
 import { commentService } from "@/src/services/comment.service";
 import { IComment } from "@/types/comment";
 import { newsService } from "@/src/services/news.service";
 import { videoService } from "@/src/services/video.service";
+import { memberService } from "@/src/services/member.service";
 import NewsCard from "@src/components/cards/NewsCard";
 import VideoCard from "@src/components/cards/VideoCard";
 
@@ -29,6 +30,24 @@ export default function PostDetailPage() {
   const [expandedComments, setExpandedComments] = useState<Set<number>>(
     new Set()
   );
+  const [currentUser, setCurrentUser] = useState<IMember.Me | null>(null);
+  const [editingComment, setEditingComment] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
+
+  // 현재 사용자 정보 가져오기
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const userData = await memberService.getMe();
+        setCurrentUser(userData);
+      } catch (error) {
+        console.error("Failed to fetch current user:", error);
+        setCurrentUser(null);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -100,6 +119,89 @@ export default function PostDetailPage() {
       newExpanded.add(commentId);
     }
     setExpandedComments(newExpanded);
+  };
+
+  // 댓글 수정 시작
+  const startEditComment = (commentId: number, currentBody: string) => {
+    setEditingComment(commentId);
+    setEditText(currentBody);
+  };
+
+  // 댓글 수정 취소
+  const cancelEditComment = () => {
+    setEditingComment(null);
+    setEditText("");
+  };
+
+  // 댓글 수정 완료
+  const handleEditComment = async (commentId: number) => {
+    if (!editText.trim()) return;
+
+    try {
+      await commentService.updateComment(commentId, editText);
+      setEditingComment(null);
+      setEditText("");
+
+      // 댓글 목록 새로고침
+      const { list, meta } = await commentService.getComments(postId, {
+        page: currentPage - 1,
+        size: 10,
+        sort: "createdAt,DESC",
+      });
+      setComments(list);
+      setCommentCount(meta.totalElements);
+      setTotalPages(meta.totalPages);
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      alert("댓글 수정에 실패했습니다.");
+    }
+  };
+
+  // 댓글 삭제
+  const handleDeleteComment = async (commentId: number) => {
+    if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+    try {
+      await commentService.deleteComment(commentId);
+
+      // 댓글 목록 새로고침
+      const { list, meta } = await commentService.getComments(postId, {
+        page: currentPage - 1,
+        size: 10,
+        sort: "createdAt,DESC",
+      });
+      setComments(list);
+      setCommentCount(meta.totalElements);
+      setTotalPages(meta.totalPages);
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("댓글 삭제에 실패했습니다.");
+    }
+  };
+
+  // 현재 사용자가 댓글 작성자인지 확인
+  const isMyComment = (commentNickname: string) => {
+    return currentUser?.data?.nickname === commentNickname;
+  };
+
+  // 댓글 좋아요
+  const handleLikeComment = async (commentId: number) => {
+    try {
+      await commentService.likeComment(commentId);
+
+      // 댓글 목록 새로고침
+      const { list, meta } = await commentService.getComments(postId, {
+        page: currentPage - 1,
+        size: 10,
+        sort: "createdAt,DESC",
+      });
+      setComments(list);
+      setCommentCount(meta.totalElements);
+      setTotalPages(meta.totalPages);
+    } catch (error) {
+      console.error("Error liking comment:", error);
+      alert("좋아요 처리에 실패했습니다.");
+    }
   };
 
   // 날짜 포맷팅 함수
@@ -335,35 +437,123 @@ export default function PostDetailPage() {
                     <p className="font-medium text-gray-900 dark:text-white mb-1">
                       {comment.nickname}
                     </p>
-                    <p className="text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap leading-relaxed word-break overflow-wrap-anywhere">
-                      {expandedComments.has(comment.commentId)
-                        ? comment.body
-                        : comment.body.slice(0, 50)}
-                      {comment.body.length > 50 &&
-                        !expandedComments.has(comment.commentId) &&
-                        "..."}
-                    </p>
-                    {comment.body.length > 50 && (
-                      <button
-                        onClick={() =>
-                          toggleCommentExpansion(comment.commentId)
-                        }
-                        className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-1 block"
-                      >
-                        {expandedComments.has(comment.commentId)
-                          ? "접기"
-                          : "더보기"}
-                      </button>
+
+                    {editingComment === comment.commentId ? (
+                      // 편집 모드
+                      <div className="space-y-3">
+                        <textarea
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          rows={3}
+                          placeholder="댓글을 수정하세요..."
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditComment(comment.commentId)}
+                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                          >
+                            저장
+                          </button>
+                          <button
+                            onClick={cancelEditComment}
+                            className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                          >
+                            취소
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      // 일반 표시 모드
+                      <>
+                        <p className="text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap leading-relaxed word-break overflow-wrap-anywhere">
+                          {expandedComments.has(comment.commentId)
+                            ? comment.body
+                            : comment.body.slice(0, 50)}
+                          {comment.body.length > 50 &&
+                            !expandedComments.has(comment.commentId) &&
+                            "..."}
+                        </p>
+                        {comment.body.length > 50 && (
+                          <button
+                            onClick={() =>
+                              toggleCommentExpansion(comment.commentId)
+                            }
+                            className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-1 block"
+                          >
+                            {expandedComments.has(comment.commentId)
+                              ? "접기"
+                              : "더보기"}
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className="flex items-center gap-4 mt-2">
-                    <button className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                      추천
-                      {comment.likeCount}
-                    </button>
+                    {/* 좋아요/추천 버튼 - 내 댓글과 남의 댓글 구분 */}
+                    {isMyComment(comment.nickname) ? (
+                      // 내 댓글인 경우: 클릭할 수 없는 추천 수만 표시
+                      <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <svg
+                          className="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        {comment.likeCount}
+                      </span>
+                    ) : (
+                      // 남의 댓글인 경우: 클릭 가능한 좋아요 버튼
+                      <button
+                        onClick={() => handleLikeComment(comment.commentId)}
+                        className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 flex items-center gap-1 transition-colors"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        {comment.likeCount}
+                      </button>
+                    )}
+
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       {formatDate(comment.createdAt)}
                     </span>
+
+                    {/* 내 댓글인 경우에만 수정/삭제 버튼 표시 */}
+                    {isMyComment(comment.nickname) &&
+                      editingComment !== comment.commentId && (
+                        <>
+                          <button
+                            onClick={() =>
+                              startEditComment(comment.commentId, comment.body)
+                            }
+                            className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleDeleteComment(comment.commentId)
+                            }
+                            className="text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                          >
+                            삭제
+                          </button>
+                        </>
+                      )}
                   </div>
                 </div>
               </div>
