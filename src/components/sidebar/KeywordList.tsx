@@ -50,7 +50,7 @@ export default function KeywordSidebar() {
               router.push(`/main/keywords/${keyword.text}`);
             }}
             key={keyword.keywordId}
-            className="flex items-center"
+            className="flex items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded-lg transition-colors duration-150"
           >
             <span className="w-6 text-sm text-gray-500 dark:text-gray-400">
               {index + 1}
