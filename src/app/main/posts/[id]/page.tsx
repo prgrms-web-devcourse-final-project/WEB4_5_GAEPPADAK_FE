@@ -400,6 +400,7 @@ export default function PostDetailPage() {
               type="text"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
+              maxLength={150}
               placeholder="댓글 입력 창"
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -409,6 +410,27 @@ export default function PostDetailPage() {
             >
               입력
             </button>
+          </div>
+
+          {/* 글자 수 표시 */}
+          <div className="flex justify-between items-center mt-2 text-sm">
+            <div></div>
+            <div
+              className={`${
+                comment.length > 140
+                  ? "text-red-500 dark:text-red-400"
+                  : comment.length > 120
+                    ? "text-orange-500 dark:text-orange-400"
+                    : "text-gray-500 dark:text-gray-400"
+              }`}
+            >
+              {comment.length}/150
+              {comment.length > 140 && (
+                <span className="ml-2 text-red-500 dark:text-red-400">
+                  (글자 수 제한에 가까워졌습니다)
+                </span>
+              )}
+            </div>
           </div>
         </form>
 
@@ -440,10 +462,32 @@ export default function PostDetailPage() {
                         <textarea
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
+                          maxLength={150}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                           rows={3}
                           placeholder="댓글을 수정하세요..."
                         />
+
+                        {/* 수정 모드 글자 수 표시 */}
+                        <div className="flex justify-end text-sm">
+                          <div
+                            className={`${
+                              editText.length > 140
+                                ? "text-red-500 dark:text-red-400"
+                                : editText.length > 120
+                                  ? "text-orange-500 dark:text-orange-400"
+                                  : "text-gray-500 dark:text-gray-400"
+                            }`}
+                          >
+                            {editText.length}/150
+                            {editText.length > 140 && (
+                              <span className="ml-2 text-red-500 dark:text-red-400">
+                                (글자 수 제한에 가까워졌습니다)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEditComment(comment.commentId)}
