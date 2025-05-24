@@ -53,14 +53,16 @@ const SignupForm: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
           <div className="text-center mb-8">
-            <div className="mx-auto w-20 h-20 relative mb-4">
-              <Image
-                src="/logo.svg"
-                alt="로고"
-                layout="fill"
-                objectFit="contain"
-                priority
-              />
+            <div className="mx-auto w-48 h-48 relative mb-8 rounded-full overflow-hidden bg-white shadow flex items-center justify-center">
+              <div className="relative w-36 h-36">
+                <Image
+                  src="/kkokkio.png"
+                  alt="로고"
+                  layout="fill"
+                  objectFit="contain"
+                  priority
+                />
+              </div>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               회원가입
