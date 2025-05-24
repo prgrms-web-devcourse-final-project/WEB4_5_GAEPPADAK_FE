@@ -19,7 +19,7 @@ export default function KeywordDetailPage() {
   const [newsItems, setNewsItems] = useState<INews.ISource.ISummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(4);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +33,7 @@ export default function KeywordDetailPage() {
         });
         if (postsResponse && postsResponse.code === "200") {
           setPosts(postsResponse.data.list || []);
+          setTotalPages(postsResponse.data.meta.totalPages);
         }
 
         const newsResponse = await newsService.getSourceNewsList({
@@ -84,8 +85,8 @@ export default function KeywordDetailPage() {
             >
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex gap-6">
                 {/* 썸네일 */}
-                <div className="w-24 h-24 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                  {post.thumbnailUrl ? (
+                {post.thumbnailUrl && (
+                  <div className="w-24 h-24 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                     <Image
                       src={post.thumbnailUrl}
                       alt={post.title}
@@ -93,14 +94,8 @@ export default function KeywordDetailPage() {
                       height={96}
                       className="rounded object-cover"
                     />
-                  ) : (
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      썸네일
-                      <br />
-                      이미지
-                    </span>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* 콘텐츠 */}
                 <div className="flex-1">
@@ -137,11 +132,11 @@ export default function KeywordDetailPage() {
         )}
 
         {/* 페이지네이션 - 포스트가 있을 때만 표시 */}
-        {posts.length > 0 && (
+        {posts.length > 0 && totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mt-8">
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={currentPage === 1}
             >
               <svg
@@ -159,13 +154,147 @@ export default function KeywordDetailPage() {
               </svg>
             </button>
 
-            <span className="mx-2 text-gray-700 dark:text-gray-300">
-              {currentPage} | 2 | 3 | 4
-            </span>
+            <div className="flex items-center gap-1">
+              {(() => {
+                const pages = [];
+                const maxVisiblePages = 5;
+
+                if (totalPages <= maxVisiblePages) {
+                  // 총 페이지가 5개 이하인 경우 모든 페이지 표시
+                  for (let i = 1; i <= totalPages; i++) {
+                    pages.push(
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i)}
+                        className={`px-3 py-2 rounded-md text-sm ${
+                          i === currentPage
+                            ? "bg-blue-500 text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        {i}
+                      </button>
+                    );
+                  }
+                } else {
+                  // 총 페이지가 5개 초과인 경우
+                  if (currentPage <= 3) {
+                    // 처음 부분에 있는 경우
+                    for (let i = 1; i <= 4; i++) {
+                      pages.push(
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i)}
+                          className={`px-3 py-2 rounded-md text-sm ${
+                            i === currentPage
+                              ? "bg-blue-500 text-white"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          }`}
+                        >
+                          {i}
+                        </button>
+                      );
+                    }
+                    pages.push(
+                      <span key="dots1" className="px-2 text-gray-500">
+                        ...
+                      </span>
+                    );
+                    pages.push(
+                      <button
+                        key={totalPages}
+                        onClick={() => setCurrentPage(totalPages)}
+                        className="px-3 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        {totalPages}
+                      </button>
+                    );
+                  } else if (currentPage >= totalPages - 2) {
+                    // 끝 부분에 있는 경우
+                    pages.push(
+                      <button
+                        key={1}
+                        onClick={() => setCurrentPage(1)}
+                        className="px-3 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        1
+                      </button>
+                    );
+                    pages.push(
+                      <span key="dots1" className="px-2 text-gray-500">
+                        ...
+                      </span>
+                    );
+                    for (let i = totalPages - 3; i <= totalPages; i++) {
+                      pages.push(
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i)}
+                          className={`px-3 py-2 rounded-md text-sm ${
+                            i === currentPage
+                              ? "bg-blue-500 text-white"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          }`}
+                        >
+                          {i}
+                        </button>
+                      );
+                    }
+                  } else {
+                    // 중간 부분에 있는 경우
+                    pages.push(
+                      <button
+                        key={1}
+                        onClick={() => setCurrentPage(1)}
+                        className="px-3 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        1
+                      </button>
+                    );
+                    pages.push(
+                      <span key="dots1" className="px-2 text-gray-500">
+                        ...
+                      </span>
+                    );
+                    for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                      pages.push(
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i)}
+                          className={`px-3 py-2 rounded-md text-sm ${
+                            i === currentPage
+                              ? "bg-blue-500 text-white"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          }`}
+                        >
+                          {i}
+                        </button>
+                      );
+                    }
+                    pages.push(
+                      <span key="dots2" className="px-2 text-gray-500">
+                        ...
+                      </span>
+                    );
+                    pages.push(
+                      <button
+                        key={totalPages}
+                        onClick={() => setCurrentPage(totalPages)}
+                        className="px-3 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        {totalPages}
+                      </button>
+                    );
+                  }
+                }
+
+                return pages;
+              })()}
+            </div>
 
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={currentPage === totalPages}
             >
               <svg
@@ -197,24 +326,20 @@ export default function KeywordDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {newsItems.slice(0, 5).map((news, index) => (
               <Link
-                key={news.id || index}
+                key={news.sourceId || index}
                 href={news.url || "#"}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
               >
-                <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 relative flex items-center justify-center">
-                  {news.thumbnailUrl ? (
+                {news.thumbnailUrl && (
+                  <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 relative flex items-center justify-center">
                     <Image
                       src={news.thumbnailUrl}
                       alt={news.title || "뉴스 썸네일"}
                       fill
                       className="object-cover rounded-lg"
                     />
-                  ) : (
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      썸네일 이미지
-                    </span>
-                  )}
-                </div>
+                  </div>
+                )}
                 <p className="text-sm font-medium text-gray-900 dark:text-white text-center mb-2">
                   {news.source || "썸네일 이미지"}
                 </p>

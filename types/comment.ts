@@ -12,6 +12,8 @@ export interface IComment {
   createdAt: string;
 
   profileUrl: string;
+
+  isLiked: boolean;
 }
 
 export namespace IComment {

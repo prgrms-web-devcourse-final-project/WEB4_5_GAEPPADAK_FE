@@ -11,6 +11,9 @@ import { commentService } from "@/src/services/comment.service";
 import { IComment } from "@/types/comment";
 import { newsService } from "@/src/services/news.service";
 import { videoService } from "@/src/services/video.service";
+import { useUser } from "@/src/contexts/UserContext";
+import NewsCard from "@src/components/cards/NewsCard";
+import VideoCard from "@src/components/cards/VideoCard";
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -22,8 +25,21 @@ export default function PostDetailPage() {
   const [commentCount, setCommentCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [news, setNews] = useState<INews.ISource.ISummary[]>([]);
+  const [news, setNews] = useState<INews.ISource.ISummaryForPost[]>([]);
   const [videos, setVideos] = useState<IVideo.ISource.ISummary[]>([]);
+  const [expandedComments, setExpandedComments] = useState<Set<number>>(
+    new Set()
+  );
+  const [editingComment, setEditingComment] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
+
+  // Context에서 사용자 정보 가져오기
+  const { currentUser, isLoggedIn } = useUser();
+
+  // 현재 사용자가 댓글 작성자인지 확인
+  const isMyComment = (commentNickname: string) => {
+    return currentUser?.data?.nickname === commentNickname;
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -33,10 +49,11 @@ export default function PostDetailPage() {
         setPost(response.data);
 
         const { data: videoList } = await videoService.getSourceVideos(postId);
-        setVideos(videoList);
+        setVideos(videoList.list);
 
         const { data: newsList } = await newsService.getSourceNews(postId);
-        setNews(newsList);
+
+        setNews(newsList.list);
       } catch (error) {
         console.error("Error fetching post:", error);
       } finally {
@@ -85,6 +102,114 @@ export default function PostDetailPage() {
     }
   };
 
+  // 댓글 펼치기/접기 토글
+  const toggleCommentExpansion = (commentId: number) => {
+    const newExpanded = new Set(expandedComments);
+    if (newExpanded.has(commentId)) {
+      newExpanded.delete(commentId);
+    } else {
+      newExpanded.add(commentId);
+    }
+    setExpandedComments(newExpanded);
+  };
+
+  // 댓글 수정 시작
+  const startEditComment = (commentId: number, currentBody: string) => {
+    setEditingComment(commentId);
+    setEditText(currentBody);
+  };
+
+  // 댓글 수정 취소
+  const cancelEditComment = () => {
+    setEditingComment(null);
+    setEditText("");
+  };
+
+  // 댓글 수정 완료
+  const handleEditComment = async (commentId: number) => {
+    if (!editText.trim()) return;
+
+    try {
+      await commentService.updateComment(commentId, editText);
+      setEditingComment(null);
+      setEditText("");
+
+      // 댓글 목록 새로고침
+      const { list, meta } = await commentService.getComments(postId, {
+        page: currentPage - 1,
+        size: 10,
+        sort: "createdAt,DESC",
+      });
+      setComments(list);
+      setCommentCount(meta.totalElements);
+      setTotalPages(meta.totalPages);
+    } catch (error) {
+      console.error("Error updating comment:", error);
+      alert("댓글 수정에 실패했습니다.");
+    }
+  };
+
+  // 댓글 삭제
+  const handleDeleteComment = async (commentId: number) => {
+    if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+    try {
+      await commentService.deleteComment(commentId);
+
+      // 댓글 목록 새로고침
+      const { list, meta } = await commentService.getComments(postId, {
+        page: currentPage - 1,
+        size: 10,
+        sort: "createdAt,DESC",
+      });
+      setComments(list);
+      setCommentCount(meta.totalElements);
+      setTotalPages(meta.totalPages);
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("댓글 삭제에 실패했습니다.");
+    }
+  };
+
+  // 댓글 좋아요/좋아요 취소
+  const handleLikeComment = async (
+    commentId: number,
+    isCurrentlyLiked: boolean
+  ) => {
+    try {
+      if (isCurrentlyLiked) {
+        // 현재 좋아요 상태이면 좋아요 취소
+        await commentService.unlikeComment(commentId);
+      } else {
+        // 현재 좋아요하지 않은 상태이면 좋아요
+        await commentService.likeComment(commentId);
+      }
+
+      // 댓글 목록 새로고침
+      const { list, meta } = await commentService.getComments(postId, {
+        page: currentPage - 1,
+        size: 10,
+        sort: "createdAt,DESC",
+      });
+      setComments(list);
+      setCommentCount(meta.totalElements);
+      setTotalPages(meta.totalPages);
+    } catch (error) {
+      console.error("Error toggling comment like:", error);
+      alert("좋아요 처리에 실패했습니다.");
+    }
+  };
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split("T")[0]; // YYYY-MM-DD 형식
+    } catch (error) {
+      return dateString; // 파싱 실패시 원본 반환
+    }
+  };
+
   // 페이지네이션 렌더링 함수
   const renderPagination = () => {
     const pages = [];
@@ -96,7 +221,7 @@ export default function PostDetailPage() {
           <button
             key={i}
             onClick={() => setCurrentPage(i)}
-            className={`px-3 py-1 rounded-md ${
+            className={`px-3 py-1 rounded-md cursor-pointer ${
               currentPage === i
                 ? "bg-blue-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
@@ -138,7 +263,7 @@ export default function PostDetailPage() {
           <button
             key={i}
             onClick={() => setCurrentPage(i)}
-            className={`px-3 py-1 rounded-md ${
+            className={`px-3 py-1 rounded-md cursor-pointer ${
               currentPage === i
                 ? "bg-blue-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
@@ -164,7 +289,7 @@ export default function PostDetailPage() {
           <button
             key={totalPages}
             onClick={() => setCurrentPage(totalPages)}
-            className={`px-3 py-1 rounded-md ${
+            className={`px-3 py-1 rounded-md cursor-pointer ${
               currentPage === totalPages
                 ? "bg-blue-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
@@ -194,7 +319,7 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto w-full overflow-hidden">
       {/* 뒤로가기 버튼 */}
       <Link
         href="/"
@@ -275,23 +400,45 @@ export default function PostDetailPage() {
               type="text"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
+              maxLength={150}
               placeholder="댓글 입력 창"
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors cursor-pointer"
             >
               입력
             </button>
           </div>
+
+          {/* 글자 수 표시 */}
+          <div className="flex justify-between items-center mt-2 text-sm">
+            <div></div>
+            <div
+              className={`${
+                comment.length > 140
+                  ? "text-red-500 dark:text-red-400"
+                  : comment.length > 120
+                    ? "text-orange-500 dark:text-orange-400"
+                    : "text-gray-500 dark:text-gray-400"
+              }`}
+            >
+              {comment.length}/150
+              {comment.length > 140 && (
+                <span className="ml-2 text-red-500 dark:text-red-400">
+                  (글자 수 제한에 가까워졌습니다)
+                </span>
+              )}
+            </div>
+          </div>
         </form>
 
         {/* 댓글 목록 */}
-        <div className="space-y-6">
+        <div className="space-y-6 overflow-hidden">
           {comments.length > 0 ? (
             comments.map((comment) => (
-              <div key={comment.commentId} className="flex gap-4">
+              <div key={comment.commentId} className="flex gap-4 min-h-fit">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700">
                   {comment.profileUrl && (
                     <Image
@@ -303,23 +450,136 @@ export default function PostDetailPage() {
                     />
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                     <p className="font-medium text-gray-900 dark:text-white mb-1">
                       {comment.nickname}
                     </p>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      {comment.body}
-                    </p>
+
+                    {editingComment === comment.commentId ? (
+                      // 편집 모드
+                      <div className="space-y-3">
+                        <textarea
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          maxLength={150}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          rows={3}
+                          placeholder="댓글을 수정하세요..."
+                        />
+
+                        {/* 수정 모드 글자 수 표시 */}
+                        <div className="flex justify-end text-sm">
+                          <div
+                            className={`${
+                              editText.length > 140
+                                ? "text-red-500 dark:text-red-400"
+                                : editText.length > 120
+                                  ? "text-orange-500 dark:text-orange-400"
+                                  : "text-gray-500 dark:text-gray-400"
+                            }`}
+                          >
+                            {editText.length}/150
+                            {editText.length > 140 && (
+                              <span className="ml-2 text-red-500 dark:text-red-400">
+                                (글자 수 제한에 가까워졌습니다)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditComment(comment.commentId)}
+                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors cursor-pointer"
+                          >
+                            저장
+                          </button>
+                          <button
+                            onClick={cancelEditComment}
+                            className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors cursor-pointer"
+                          >
+                            취소
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      // 일반 표시 모드
+                      <>
+                        <p className="text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap leading-relaxed word-break overflow-wrap-anywhere">
+                          {expandedComments.has(comment.commentId)
+                            ? comment.body
+                            : comment.body.slice(0, 50)}
+                          {comment.body.length > 50 &&
+                            !expandedComments.has(comment.commentId) &&
+                            "..."}
+                        </p>
+                        {comment.body.length > 50 && (
+                          <button
+                            onClick={() =>
+                              toggleCommentExpansion(comment.commentId)
+                            }
+                            className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-1 block cursor-pointer"
+                          >
+                            {expandedComments.has(comment.commentId)
+                              ? "접기"
+                              : "더보기"}
+                          </button>
+                        )}
+                      </>
+                    )}
                   </div>
                   <div className="flex items-center gap-4 mt-2">
-                    <button className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                      추천
-                      {comment.likeCount}
-                    </button>
+                    {/* 좋아요/추천 버튼 - 내 댓글과 남의 댓글 구분 */}
+                    {isLoggedIn && isMyComment(comment.nickname) ? (
+                      // 내 댓글인 경우: 클릭할 수 없는 추천 수만 표시
+                      <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        ❤️ {comment.likeCount}
+                      </span>
+                    ) : (
+                      // 남의 댓글인 경우: 클릭 가능한 좋아요 버튼
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleLikeComment(comment.commentId, comment.isLiked);
+                        }}
+                        className={`text-sm flex items-center gap-1 transition-colors cursor-pointer ${
+                          comment.isLiked
+                            ? "text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
+                            : "text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                        }`}
+                      >
+                        {comment.isLiked ? "❤️" : "🤍"} {comment.likeCount}
+                      </button>
+                    )}
+
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {comment.createdAt}
+                      {formatDate(comment.createdAt)}
                     </span>
+
+                    {/* 내 댓글인 경우에만 수정/삭제 버튼 표시 */}
+                    {isLoggedIn &&
+                      isMyComment(comment.nickname) &&
+                      editingComment !== comment.commentId && (
+                        <>
+                          <button
+                            onClick={() =>
+                              startEditComment(comment.commentId, comment.body)
+                            }
+                            className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors cursor-pointer"
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleDeleteComment(comment.commentId)
+                            }
+                            className="text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors cursor-pointer"
+                          >
+                            삭제
+                          </button>
+                        </>
+                      )}
                   </div>
                 </div>
               </div>
@@ -340,7 +600,7 @@ export default function PostDetailPage() {
               className={`p-2 rounded-md ${
                 currentPage === 1
                   ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-pointer"
               }`}
             >
               <svg
@@ -366,7 +626,7 @@ export default function PostDetailPage() {
               className={`p-2 rounded-md ${
                 currentPage === totalPages
                   ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-pointer"
               }`}
             >
               <svg
@@ -388,92 +648,107 @@ export default function PostDetailPage() {
       </div>
 
       {/* 뉴스 추천 섹션 */}
-      {news.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            뉴스 추천
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {news.map((newsItem) => (
-              <Link
-                key={newsItem.id}
-                href={`/news/${newsItem.id}`}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mx-auto mb-2 relative">
-                  {newsItem.thumbnailUrl ? (
-                    <Image
-                      src={newsItem.thumbnailUrl}
-                      alt={newsItem.title}
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24">
-                        <Image
-                          src="/placeholder.jpg"
-                          alt="썸네일"
-                          width={100}
-                          height={75}
-                          className="object-contain"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white text-center mb-2 line-clamp-2">
-                  {newsItem.title}
-                </p>
-              </Link>
-            ))}
-          </div>
+      <section className="mt-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            관련 뉴스
+          </h2>
         </div>
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {news.length > 0 ? (
+            news.slice(0, 5).map((newsItem, index) => (
+              <NewsCard
+                key={index}
+                news={{
+                  newsId: newsItem.sourceId,
+                  title: newsItem.title,
+                  url: newsItem.url || "#",
+                  thumbnailUrl: newsItem.thumbnailUrl,
+                  publishedAt: "",
+                  summary: "",
+                  platform: "",
+                }}
+              />
+            ))
+          ) : (
+            <div className="col-span-full">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-10 text-center border border-gray-100 dark:border-gray-700">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 8l-7 7-7-7"
+                  />
+                </svg>
+                <p className="text-lg text-gray-600 dark:text-gray-300 font-medium">
+                  관련 뉴스가 없습니다.
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  이 포스트와 관련된 뉴스 콘텐츠를 찾을 수 없습니다.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* 유튜브 추천 섹션 */}
-      {videos.length > 0 && (
-        <div className="mt-8 mb-10">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            유튜브 추천
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {videos.map((video) => (
-              <Link
-                key={video.id}
-                href={video.url}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mx-auto mb-2 relative">
-                  {video.thumbnailUrl ? (
-                    <Image
-                      src={video.thumbnailUrl}
-                      alt={video.title}
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24">
-                        <Image
-                          src="/placeholder.jpg"
-                          alt="썸네일"
-                          width={100}
-                          height={75}
-                          className="object-contain"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white text-center mb-2 line-clamp-2">
-                  {video.title}
-                </p>
-              </Link>
-            ))}
-          </div>
+      <section className="mt-8 mb-10">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            관련 유튜브
+          </h2>
         </div>
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {videos.length > 0 ? (
+            videos.slice(0, 5).map((video, index) => (
+              <VideoCard
+                key={index}
+                video={{
+                  videoId: video.id,
+                  title: video.title,
+                  url: video.url || "#",
+                  thumbnailUrl: video.thumbnailUrl,
+                  publishedAt: "",
+                  platform: "YOUTUBE",
+                }}
+              />
+            ))
+          ) : (
+            <div className="col-span-full">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-10 text-center border border-gray-100 dark:border-gray-700">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                <p className="text-lg text-gray-600 dark:text-gray-300 font-medium">
+                  관련 유튜브가 없습니다.
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  이 포스트와 관련된 유튜브 콘텐츠를 찾을 수 없습니다.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
