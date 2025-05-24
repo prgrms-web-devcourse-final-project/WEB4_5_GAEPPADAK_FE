@@ -35,6 +35,7 @@ function EmailVerificationForm() {
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState<number>(300);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const router = useRouter();
@@ -100,11 +101,12 @@ function EmailVerificationForm() {
       });
 
       setSuccess("이메일 인증이 완료되었습니다.");
+      setIsRedirecting(true);
 
       // 성공 시 다음 페이지로 이동 (필요에 따라 변경)
       setTimeout(() => {
         router.push("/auth/signin"); // 또는 다음 단계로 이동
-      }, 1000);
+      }, 2000);
     } catch (error) {
       if (error instanceof AxiosError) {
         setError(error.response?.data.message);
@@ -115,6 +117,63 @@ function EmailVerificationForm() {
       setIsSubmitting(false);
     }
   };
+
+  // 리다이렉트 중일 때 로딩 화면 표시
+  if (isRedirecting) {
+    return (
+      <div className="w-full max-w-md">
+        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
+          <div className="text-center">
+            <div className="mx-auto w-48 h-48 relative mb-8 rounded-full overflow-hidden bg-white shadow flex items-center justify-center">
+              <div className="relative w-36 h-36">
+                <Image
+                  src="/kkokkio.png"
+                  alt="로고"
+                  layout="fill"
+                  objectFit="contain"
+                  priority
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <svg
+                className="animate-spin h-12 w-12 text-indigo-600 mb-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                인증 완료!
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                로그인 페이지로 이동 중입니다...
+              </p>
+
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md">
