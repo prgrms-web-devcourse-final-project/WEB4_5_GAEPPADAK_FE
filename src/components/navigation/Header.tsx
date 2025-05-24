@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
               <>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 rounded-full text-sm text-white bg-blue-600 hover:bg-blue-700"
+                  className="px-4 py-2 rounded-full text-sm text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
                 >
                   로그아웃
                 </button>

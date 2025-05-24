@@ -263,7 +263,7 @@ const SignIn: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 cursor-pointer ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
               >
                 {loading ? (
                   <>
