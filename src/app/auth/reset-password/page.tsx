@@ -126,6 +126,8 @@ const ResetPasswordPage = () => {
       setTimeout(() => {
         setStep(2);
         setIsTransitioning(false);
+        setSuccess("");
+        setError("");
       }, 1500);
     } catch (error) {
       if (error instanceof AxiosError && error.response?.data?.message) {
@@ -165,6 +167,8 @@ const ResetPasswordPage = () => {
       setTimeout(() => {
         setStep(3);
         setIsTransitioning(false);
+        setSuccess("");
+        setError("");
       }, 1500);
     } catch (error) {
       if (error instanceof AxiosError && error.response?.data?.message) {
