@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "../../../services/auth.service";
 import { IAuth } from "../../../../types";
+import { AxiosError } from "axios";
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -42,7 +43,11 @@ const SignIn: React.FC = () => {
         router.push("/main");
       }, 2000);
     } catch (err) {
-      setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+      if (err instanceof AxiosError && err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+      }
       console.error(err);
     } finally {
       setLoading(false);
