@@ -66,6 +66,17 @@ export class CommentService {
       throw error;
     }
   }
+
+  async unlikeComment(commentId: number) {
+    try {
+      await axiosInstance.delete<ApiResponse<void>>(
+        `/api/v1/comments/${commentId}/like`
+      );
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export const commentService = new CommentService();

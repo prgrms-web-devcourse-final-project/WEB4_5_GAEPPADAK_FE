@@ -171,10 +171,19 @@ export default function PostDetailPage() {
     }
   };
 
-  // 댓글 좋아요
-  const handleLikeComment = async (commentId: number) => {
+  // 댓글 좋아요/좋아요 취소
+  const handleLikeComment = async (
+    commentId: number,
+    isCurrentlyLiked: boolean
+  ) => {
     try {
-      await commentService.likeComment(commentId);
+      if (isCurrentlyLiked) {
+        // 현재 좋아요 상태이면 좋아요 취소
+        await commentService.unlikeComment(commentId);
+      } else {
+        // 현재 좋아요하지 않은 상태이면 좋아요
+        await commentService.likeComment(commentId);
+      }
 
       // 댓글 목록 새로고침
       const { list, meta } = await commentService.getComments(postId, {
@@ -186,7 +195,7 @@ export default function PostDetailPage() {
       setCommentCount(meta.totalElements);
       setTotalPages(meta.totalPages);
     } catch (error) {
-      console.error("Error liking comment:", error);
+      console.error("Error toggling comment like:", error);
       alert("좋아요 처리에 실패했습니다.");
     }
   };
@@ -497,21 +506,29 @@ export default function PostDetailPage() {
                     ) : (
                       // 남의 댓글인 경우: 클릭 가능한 좋아요 버튼
                       <button
-                        onClick={() => handleLikeComment(comment.commentId)}
-                        className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 flex items-center gap-1 transition-colors"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleLikeComment(comment.commentId, comment.isLiked);
+                        }}
+                        className={`text-sm flex items-center gap-1 transition-colors ${
+                          comment.isLiked
+                            ? "text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
+                            : "text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                        }`}
                       >
                         <svg
                           className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
+                          fill={comment.isLiked ? "currentColor" : "none"}
+                          stroke={comment.isLiked ? "none" : "currentColor"}
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
                         >
-                          <path
-                            fillRule="evenodd"
-                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                            clipRule="evenodd"
-                          />
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
-                        {comment.likeCount}
+                        <span>
+                          {comment.isLiked ? "좋아요 취소" : "좋아요"}
+                        </span>
+                        <span>({comment.likeCount})</span>
                       </button>
                     )}
 
