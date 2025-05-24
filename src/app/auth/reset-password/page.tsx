@@ -20,6 +20,11 @@ const ResetPasswordPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // 개별 필드 에러 상태
+  const [newPasswordError, setNewPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
   const router = useRouter();
 
   // 시간 포맷팅 (분:초)
@@ -45,16 +50,53 @@ const ResetPasswordPage = () => {
   }, [timeLeft, step]);
 
   // 비밀번호 유효성 검사
-  const validatePassword = (password: string) => {
+  const validateNewPassword = (password: string) => {
     if (password.length < 8 || password.length > 20) {
-      return "비밀번호는 8~20자 사이여야 합니다.";
+      setNewPasswordError("비밀번호는 8~20자 사이여야 합니다.");
+      return false;
     }
     const passwordRegex =
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/;
     if (!passwordRegex.test(password)) {
-      return "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.";
+      setNewPasswordError("비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.");
+      return false;
     }
-    return "";
+    setNewPasswordError("");
+    return true;
+  };
+
+  // 비밀번호 확인 유효성 검사
+  const validateConfirmPassword = (confirmPwd: string, newPwd: string) => {
+    if (confirmPwd && newPwd && confirmPwd !== newPwd) {
+      setConfirmPasswordError("비밀번호가 일치하지 않습니다.");
+      return false;
+    }
+    setConfirmPasswordError("");
+    return true;
+  };
+
+  // 새 비밀번호 입력 핸들러
+  const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNewPassword(value);
+    if (value) {
+      validateNewPassword(value);
+      // 비밀번호 확인 필드가 입력되어 있다면 다시 검사
+      if (confirmPassword) {
+        validateConfirmPassword(confirmPassword, value);
+      }
+    }
+  };
+
+  // 비밀번호 확인 입력 핸들러
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    if (value) {
+      validateConfirmPassword(value, newPassword);
+    }
   };
 
   // 1단계: 이메일 발송
@@ -137,14 +179,15 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    const passwordError = validatePassword(newPassword);
-    if (passwordError) {
-      setError(passwordError);
-      return;
-    }
+    // 모든 유효성 검사 실행
+    const isNewPasswordValid = validateNewPassword(newPassword);
+    const isConfirmPasswordValid = validateConfirmPassword(
+      confirmPassword,
+      newPassword
+    );
 
-    if (newPassword !== confirmPassword) {
-      setError("비밀번호가 일치하지 않습니다.");
+    if (!isNewPasswordValid || !isConfirmPasswordValid) {
+      setError("입력 정보를 다시 확인해주세요.");
       return;
     }
 
@@ -503,8 +546,12 @@ const ResetPasswordPage = () => {
                     autoComplete="new-password"
                     required
                     value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="py-3 pl-10 pr-10 block w-full border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm"
+                    onChange={handleNewPasswordChange}
+                    className={`py-3 pl-10 pr-10 block w-full border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm ${
+                      newPasswordError
+                        ? "border-red-500 dark:border-red-500"
+                        : "border-gray-300 dark:border-gray-600"
+                    }`}
                     placeholder="새 비밀번호"
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -543,6 +590,11 @@ const ResetPasswordPage = () => {
                     </button>
                   </div>
                 </div>
+                {newPasswordError && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {newPasswordError}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -573,8 +625,12 @@ const ResetPasswordPage = () => {
                     autoComplete="new-password"
                     required
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="py-3 pl-10 pr-10 block w-full border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm"
+                    onChange={handleConfirmPasswordChange}
+                    className={`py-3 pl-10 pr-10 block w-full border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm ${
+                      confirmPasswordError
+                        ? "border-red-500 dark:border-red-500"
+                        : "border-gray-300 dark:border-gray-600"
+                    }`}
                     placeholder="새 비밀번호 확인"
                   />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -615,6 +671,11 @@ const ResetPasswordPage = () => {
                     </button>
                   </div>
                 </div>
+                {confirmPasswordError && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {confirmPasswordError}
+                  </p>
+                )}
               </div>
 
               <div className="pt-2">
