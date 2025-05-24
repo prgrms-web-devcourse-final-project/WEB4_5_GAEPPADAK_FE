@@ -26,6 +26,9 @@ export default function PostDetailPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [news, setNews] = useState<INews.ISource.ISummaryForPost[]>([]);
   const [videos, setVideos] = useState<IVideo.ISource.ISummary[]>([]);
+  const [expandedComments, setExpandedComments] = useState<Set<number>>(
+    new Set()
+  );
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -85,6 +88,27 @@ export default function PostDetailPage() {
     } catch (error) {
       console.error("Error creating comment:", error);
       alert("댓글 작성에 실패했습니다. 로그인해주세요.");
+    }
+  };
+
+  // 댓글 펼치기/접기 토글
+  const toggleCommentExpansion = (commentId: number) => {
+    const newExpanded = new Set(expandedComments);
+    if (newExpanded.has(commentId)) {
+      newExpanded.delete(commentId);
+    } else {
+      newExpanded.add(commentId);
+    }
+    setExpandedComments(newExpanded);
+  };
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split("T")[0]; // YYYY-MM-DD 형식
+    } catch (error) {
+      return dateString; // 파싱 실패시 원본 반환
     }
   };
 
@@ -197,7 +221,7 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto w-full overflow-hidden">
       {/* 뒤로가기 버튼 */}
       <Link
         href="/"
@@ -291,10 +315,10 @@ export default function PostDetailPage() {
         </form>
 
         {/* 댓글 목록 */}
-        <div className="space-y-6">
+        <div className="space-y-6 overflow-hidden">
           {comments.length > 0 ? (
             comments.map((comment) => (
-              <div key={comment.commentId} className="flex gap-4">
+              <div key={comment.commentId} className="flex gap-4 min-h-fit">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700">
                   {comment.profileUrl && (
                     <Image
@@ -306,14 +330,31 @@ export default function PostDetailPage() {
                     />
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                     <p className="font-medium text-gray-900 dark:text-white mb-1">
                       {comment.nickname}
                     </p>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      {comment.body}
+                    <p className="text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap leading-relaxed word-break overflow-wrap-anywhere">
+                      {expandedComments.has(comment.commentId)
+                        ? comment.body
+                        : comment.body.slice(0, 50)}
+                      {comment.body.length > 50 &&
+                        !expandedComments.has(comment.commentId) &&
+                        "..."}
                     </p>
+                    {comment.body.length > 50 && (
+                      <button
+                        onClick={() =>
+                          toggleCommentExpansion(comment.commentId)
+                        }
+                        className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-1 block"
+                      >
+                        {expandedComments.has(comment.commentId)
+                          ? "접기"
+                          : "더보기"}
+                      </button>
+                    )}
                   </div>
                   <div className="flex items-center gap-4 mt-2">
                     <button className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
@@ -321,7 +362,7 @@ export default function PostDetailPage() {
                       {comment.likeCount}
                     </button>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {comment.createdAt}
+                      {formatDate(comment.createdAt)}
                     </span>
                   </div>
                 </div>
