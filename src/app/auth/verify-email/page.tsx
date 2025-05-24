@@ -36,6 +36,7 @@ function EmailVerificationForm() {
   const [timeLeft, setTimeLeft] = useState<number>(300);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isRedirecting, setIsRedirecting] = useState<boolean>(false);
+  const [isResending, setIsResending] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const router = useRouter();
@@ -181,7 +182,38 @@ function EmailVerificationForm() {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-md relative">
+      {/* 재전송 중 오버레이 */}
+      {isResending && (
+        <div className="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 rounded-2xl z-10 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <svg
+              className="animate-spin h-12 w-12 text-indigo-600 mb-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <p className="text-gray-700 dark:text-gray-300 font-medium">
+              인증 코드 재전송 중...
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
         <div className="text-center mb-8">
           <div className="mx-auto w-48 h-48 relative mb-8 rounded-full overflow-hidden bg-white shadow flex items-center justify-center">
@@ -328,15 +360,19 @@ function EmailVerificationForm() {
                   try {
                     setError(""); // 기존 에러 클리어
                     setSuccess(""); // 기존 성공 메시지 클리어
+                    setIsResending(true);
                     await authService.sendEmailAuth(email);
                     setTimeLeft(300);
                     setSuccess("인증 코드가 재전송되었습니다.");
                   } catch (error) {
                     setSuccess(""); // 성공 메시지 클리어
                     setError("인증 코드 재전송에 실패했습니다.");
+                  } finally {
+                    setIsResending(false);
                   }
                 }}
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer"
+                disabled={isResending}
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 type="button"
               >
                 인증 코드 재전송
