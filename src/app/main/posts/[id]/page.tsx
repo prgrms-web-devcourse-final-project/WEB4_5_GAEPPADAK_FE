@@ -221,7 +221,7 @@ export default function PostDetailPage() {
           <button
             key={i}
             onClick={() => setCurrentPage(i)}
-            className={`px-3 py-1 rounded-md ${
+            className={`px-3 py-1 rounded-md cursor-pointer ${
               currentPage === i
                 ? "bg-blue-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
@@ -263,7 +263,7 @@ export default function PostDetailPage() {
           <button
             key={i}
             onClick={() => setCurrentPage(i)}
-            className={`px-3 py-1 rounded-md ${
+            className={`px-3 py-1 rounded-md cursor-pointer ${
               currentPage === i
                 ? "bg-blue-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
@@ -289,7 +289,7 @@ export default function PostDetailPage() {
           <button
             key={totalPages}
             onClick={() => setCurrentPage(totalPages)}
-            className={`px-3 py-1 rounded-md ${
+            className={`px-3 py-1 rounded-md cursor-pointer ${
               currentPage === totalPages
                 ? "bg-blue-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
@@ -405,7 +405,7 @@ export default function PostDetailPage() {
             />
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors cursor-pointer"
             >
               입력
             </button>
@@ -447,13 +447,13 @@ export default function PostDetailPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEditComment(comment.commentId)}
-                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                            className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors cursor-pointer"
                           >
                             저장
                           </button>
                           <button
                             onClick={cancelEditComment}
-                            className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                            className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors cursor-pointer"
                           >
                             취소
                           </button>
@@ -475,7 +475,7 @@ export default function PostDetailPage() {
                             onClick={() =>
                               toggleCommentExpansion(comment.commentId)
                             }
-                            className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-1 block"
+                            className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mt-1 block cursor-pointer"
                           >
                             {expandedComments.has(comment.commentId)
                               ? "접기"
@@ -490,18 +490,7 @@ export default function PostDetailPage() {
                     {isLoggedIn && isMyComment(comment.nickname) ? (
                       // 내 댓글인 경우: 클릭할 수 없는 추천 수만 표시
                       <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                        <svg
-                          className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        {comment.likeCount}
+                        ❤️ {comment.likeCount}
                       </span>
                     ) : (
                       // 남의 댓글인 경우: 클릭 가능한 좋아요 버튼
@@ -510,25 +499,13 @@ export default function PostDetailPage() {
                           e.preventDefault();
                           handleLikeComment(comment.commentId, comment.isLiked);
                         }}
-                        className={`text-sm flex items-center gap-1 transition-colors ${
+                        className={`text-sm flex items-center gap-1 transition-colors cursor-pointer ${
                           comment.isLiked
                             ? "text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
                             : "text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
                         }`}
                       >
-                        <svg
-                          className="w-4 h-4"
-                          fill={comment.isLiked ? "currentColor" : "none"}
-                          stroke={comment.isLiked ? "none" : "currentColor"}
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                        </svg>
-                        <span>
-                          {comment.isLiked ? "좋아요 취소" : "좋아요"}
-                        </span>
-                        <span>({comment.likeCount})</span>
+                        {comment.isLiked ? "❤️" : "🤍"} {comment.likeCount}
                       </button>
                     )}
 
@@ -545,7 +522,7 @@ export default function PostDetailPage() {
                             onClick={() =>
                               startEditComment(comment.commentId, comment.body)
                             }
-                            className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                            className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors cursor-pointer"
                           >
                             수정
                           </button>
@@ -553,7 +530,7 @@ export default function PostDetailPage() {
                             onClick={() =>
                               handleDeleteComment(comment.commentId)
                             }
-                            className="text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                            className="text-sm text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors cursor-pointer"
                           >
                             삭제
                           </button>
@@ -579,7 +556,7 @@ export default function PostDetailPage() {
               className={`p-2 rounded-md ${
                 currentPage === 1
                   ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-pointer"
               }`}
             >
               <svg
@@ -605,7 +582,7 @@ export default function PostDetailPage() {
               className={`p-2 rounded-md ${
                 currentPage === totalPages
                   ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-pointer"
               }`}
             >
               <svg
