@@ -5,13 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { postService } from "@src/services/post.service";
-import { INews, IPost, IVideo, IMember } from "@/types";
+import { INews, IPost, IVideo } from "@/types";
 import LoadingSpinner from "@src/components/ui/LoadingSpinner";
 import { commentService } from "@/src/services/comment.service";
 import { IComment } from "@/types/comment";
 import { newsService } from "@/src/services/news.service";
 import { videoService } from "@/src/services/video.service";
-import { memberService } from "@/src/services/member.service";
+import { useUser } from "@/src/contexts/UserContext";
 import NewsCard from "@src/components/cards/NewsCard";
 import VideoCard from "@src/components/cards/VideoCard";
 
@@ -30,24 +30,16 @@ export default function PostDetailPage() {
   const [expandedComments, setExpandedComments] = useState<Set<number>>(
     new Set()
   );
-  const [currentUser, setCurrentUser] = useState<IMember.Me | null>(null);
   const [editingComment, setEditingComment] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
 
-  // 현재 사용자 정보 가져오기
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const userData = await memberService.getMe();
-        setCurrentUser(userData);
-      } catch (error) {
-        console.error("Failed to fetch current user:", error);
-        setCurrentUser(null);
-      }
-    };
+  // Context에서 사용자 정보 가져오기
+  const { currentUser, isLoggedIn } = useUser();
 
-    fetchCurrentUser();
-  }, []);
+  // 현재 사용자가 댓글 작성자인지 확인
+  const isMyComment = (commentNickname: string) => {
+    return currentUser?.data?.nickname === commentNickname;
+  };
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -177,11 +169,6 @@ export default function PostDetailPage() {
       console.error("Error deleting comment:", error);
       alert("댓글 삭제에 실패했습니다.");
     }
-  };
-
-  // 현재 사용자가 댓글 작성자인지 확인
-  const isMyComment = (commentNickname: string) => {
-    return currentUser?.data?.nickname === commentNickname;
   };
 
   // 댓글 좋아요
@@ -491,7 +478,7 @@ export default function PostDetailPage() {
                   </div>
                   <div className="flex items-center gap-4 mt-2">
                     {/* 좋아요/추천 버튼 - 내 댓글과 남의 댓글 구분 */}
-                    {isMyComment(comment.nickname) ? (
+                    {isLoggedIn && isMyComment(comment.nickname) ? (
                       // 내 댓글인 경우: 클릭할 수 없는 추천 수만 표시
                       <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                         <svg
@@ -533,7 +520,8 @@ export default function PostDetailPage() {
                     </span>
 
                     {/* 내 댓글인 경우에만 수정/삭제 버튼 표시 */}
-                    {isMyComment(comment.nickname) &&
+                    {isLoggedIn &&
+                      isMyComment(comment.nickname) &&
                       editingComment !== comment.commentId && (
                         <>
                           <button
