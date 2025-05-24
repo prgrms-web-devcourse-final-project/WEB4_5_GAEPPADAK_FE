@@ -329,7 +329,7 @@ function EmailVerificationForm() {
                     setError("인증 코드 재전송에 실패했습니다.");
                   }
                 }}
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 cursor-pointer"
                 type="button"
               >
                 인증 코드 재전송
