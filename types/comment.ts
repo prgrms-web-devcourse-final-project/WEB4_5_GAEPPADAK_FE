@@ -40,6 +40,6 @@ export namespace IComment {
 
     size!: number;
 
-    sort!: "likeCount" | "createdAt";
+    sort!: "likeCount,DESC" | "createdAt,DESC";
   }
 }

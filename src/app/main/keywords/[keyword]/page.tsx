@@ -27,23 +27,22 @@ export default function KeywordDetailPage() {
         setLoading(true);
         const postsResponse = await postService.getList({
           keyword,
-          page: currentPage,
+          page: currentPage - 1,
           size: 10,
           sort: "createdAt",
         });
-
-        if (postsResponse && postsResponse.code === "SUCCESS") {
-          setPosts(postsResponse.data || []);
+        if (postsResponse && postsResponse.code === "200") {
+          setPosts(postsResponse.data.list || []);
         }
 
         const newsResponse = await newsService.getSourceNewsList({
           keyword,
-          page: 1,
+          page: 0,
           size: 10,
         });
 
-        if (newsResponse && newsResponse.code === "SUCCESS") {
-          setNewsItems(newsResponse.data || []);
+        if (newsResponse && newsResponse.code === "200") {
+          setNewsItems(newsResponse.data.list || []);
         }
       } catch (error) {
         console.error("데이터 로드 중 오류 발생:", error);

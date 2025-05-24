@@ -24,7 +24,7 @@ export default function PopularNewsPage() {
       try {
         setNewsLoading(true);
         const response = await newsService.getPopularNews({
-          page: currentPage,
+          page: currentPage - 1,
           size: 5,
         });
 
@@ -58,7 +58,7 @@ export default function PopularNewsPage() {
       try {
         setVideoLoading(true);
         const response = await videoService.getPopularVideos({
-          page: currentPage,
+          page: currentPage - 1,
           size: 5,
         });
 

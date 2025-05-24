@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { ApiResponse, IPost } from "../../types";
+import { ApiResponse, IPagination, IPost } from "../../types";
 import { axiosInstance } from "./axios.instance";
 
 class PostService {
@@ -31,8 +31,7 @@ class PostService {
   async getList(query: IPost.GetListQueryDto) {
     try {
       const response = await axiosInstance.get<
-        ApiResponse<IPost.ISummary[]>,
-        AxiosResponse<ApiResponse<IPost.ISummary[]>>
+        ApiResponse<IPagination.IOffset<IPost.ISummary[]>>
       >(`/api/v1/posts/search`, {
         params: query,
       });

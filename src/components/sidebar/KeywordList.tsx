@@ -58,15 +58,7 @@ export default function KeywordSidebar() {
             <span className="flex-1 font-medium text-gray-900 dark:text-white">
               {keyword.text}
             </span>
-            <span
-              className={`text-xs px-2 py-1 rounded-full ${
-                keyword.score > 80
-                  ? "bg-red-100 text-red-700"
-                  : "bg-gray-100 text-gray-700"
-              }`}
-            >
-              {keyword.score}
-            </span>
+            <span>{keyword.score > 10000 && "🔥"}</span>
           </div>
         ))}
       </div>

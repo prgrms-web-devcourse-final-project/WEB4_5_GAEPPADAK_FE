@@ -5,7 +5,7 @@ import { AxiosResponse } from "axios";
 class AuthService {
   async signup(signupDto: IAuth.SignUpDto): Promise<IAuth.SignUpResponse> {
     const response = await axiosInstance.post<IAuth.SignUpResponse>(
-      "api/v1/member/signup",
+      "api/v1/members/signup",
       signupDto
     );
     try {

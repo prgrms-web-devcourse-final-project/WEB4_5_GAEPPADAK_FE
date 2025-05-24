@@ -50,9 +50,9 @@ export default function PostDetailPage() {
   useEffect(() => {
     const fetchComments = async () => {
       const { list, meta } = await commentService.getComments(postId, {
-        page: currentPage,
+        page: currentPage - 1,
         size: 10,
-        sort: "createdAt",
+        sort: "createdAt,DESC",
       });
 
       setComments(list);
@@ -72,16 +72,16 @@ export default function PostDetailPage() {
       setComment("");
       // 댓글 목록 새로고침
       const { list, meta } = await commentService.getComments(postId, {
-        page: currentPage,
+        page: currentPage - 1,
         size: 10,
-        sort: "createdAt",
+        sort: "createdAt,DESC",
       });
       setComments(list);
       setCommentCount(meta.totalElements);
       setTotalPages(meta.totalPages);
     } catch (error) {
       console.error("Error creating comment:", error);
-      alert("댓글 작성에 실패했습니다. 다시 시도해주세요.");
+      alert("댓글 작성에 실패했습니다. 로그인해주세요.");
     }
   };
 

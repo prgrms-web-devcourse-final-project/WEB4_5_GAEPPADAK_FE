@@ -44,8 +44,8 @@ class NewsService {
   async getSourceNewsList(query: INews.ISource.GetMixedListQueryDto) {
     try {
       const response = await axiosInstance.get<
-        ApiResponse<INews.ISource.ISummary[]>
-      >(`/api/v1/keywords/search/sources/top`, { params: query });
+        ApiResponse<IPagination.IOffset<INews.ISource.ISummary[]>>
+      >(`/api/v1/posts/search/sources`, { params: query });
       return response.data;
     } catch (error) {
       console.error(error);
