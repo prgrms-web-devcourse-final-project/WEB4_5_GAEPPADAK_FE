@@ -74,6 +74,18 @@ class AuthService {
       throw e;
     }
   }
+
+  async resetPassword(body: IAuth.ResetPasswordDto): Promise<void> {
+    try {
+      await axiosInstance.patch<ApiResponse<void>>(
+        "api/v1/member/password",
+        body
+      );
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 export const authService = new AuthService();
