@@ -75,7 +75,7 @@ function EmailVerificationForm() {
       await authService.sendEmailAuth(email);
     };
     verifyEmail();
-  }, [email]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
