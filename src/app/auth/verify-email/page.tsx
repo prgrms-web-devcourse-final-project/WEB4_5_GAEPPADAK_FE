@@ -83,16 +83,19 @@ function EmailVerificationForm() {
 
     if (!verificationCode) {
       setError("인증 코드를 입력해주세요.");
+      setSuccess("");
       return;
     }
 
     if (timeLeft <= 0) {
       setError("인증 시간이 만료되었습니다. 다시 시도해주세요.");
+      setSuccess("");
       return;
     }
 
     setIsSubmitting(true);
     setError("");
+    setSuccess("");
 
     try {
       await authService.checkEmail({
@@ -101,6 +104,7 @@ function EmailVerificationForm() {
       });
 
       setSuccess("이메일 인증이 완료되었습니다.");
+      setError("");
       setIsRedirecting(true);
 
       // 성공 시 다음 페이지로 이동 (필요에 따라 변경)
@@ -108,6 +112,7 @@ function EmailVerificationForm() {
         router.push("/auth/signin"); // 또는 다음 단계로 이동
       }, 2000);
     } catch (error) {
+      setSuccess("");
       if (error instanceof AxiosError) {
         setError(error.response?.data.message);
       } else {
@@ -321,11 +326,13 @@ function EmailVerificationForm() {
               <button
                 onClick={async () => {
                   try {
+                    setError(""); // 기존 에러 클리어
+                    setSuccess(""); // 기존 성공 메시지 클리어
                     await authService.sendEmailAuth(email);
                     setTimeLeft(300);
-                    setError("");
                     setSuccess("인증 코드가 재전송되었습니다.");
                   } catch (error) {
+                    setSuccess(""); // 성공 메시지 클리어
                     setError("인증 코드 재전송에 실패했습니다.");
                   }
                 }}
