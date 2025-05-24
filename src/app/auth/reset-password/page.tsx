@@ -151,7 +151,7 @@ const ResetPasswordPage = () => {
 
     setIsSubmitting(true);
     try {
-      await authService.checkEmail({
+      await authService.checkEmailReset({
         email,
         authCode: verificationCode,
       });
@@ -193,8 +193,10 @@ const ResetPasswordPage = () => {
 
     setIsSubmitting(true);
     try {
-      // TODO: 비밀번호 변경 API 호출
-      // await authService.resetPassword({ email, newPassword });
+      await authService.resetPassword({
+        email,
+        newPassword,
+      });
       setSuccess("비밀번호가 성공적으로 변경되었습니다.");
       setTimeout(() => {
         router.push("/auth/signin");
