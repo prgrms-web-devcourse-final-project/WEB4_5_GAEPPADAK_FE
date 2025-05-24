@@ -24,7 +24,7 @@ export default function PostDetailPage() {
   const [commentCount, setCommentCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [news, setNews] = useState<INews.ISource.ISummary[]>([]);
+  const [news, setNews] = useState<INews.ISource.ISummaryForPost[]>([]);
   const [videos, setVideos] = useState<IVideo.ISource.ISummary[]>([]);
 
   useEffect(() => {
@@ -35,10 +35,11 @@ export default function PostDetailPage() {
         setPost(response.data);
 
         const { data: videoList } = await videoService.getSourceVideos(postId);
-        setVideos(videoList);
+        setVideos(videoList.list);
 
         const { data: newsList } = await newsService.getSourceNews(postId);
-        setNews(newsList);
+
+        setNews(newsList.list);
       } catch (error) {
         console.error("Error fetching post:", error);
       } finally {
@@ -402,13 +403,13 @@ export default function PostDetailPage() {
               <NewsCard
                 key={index}
                 news={{
-                  newsId: newsItem.id,
+                  newsId: newsItem.sourceId,
                   title: newsItem.title,
                   url: newsItem.url || "#",
                   thumbnailUrl: newsItem.thumbnailUrl,
                   publishedAt: "",
                   summary: "",
-                  platform: newsItem.platform,
+                  platform: "",
                 }}
               />
             ))

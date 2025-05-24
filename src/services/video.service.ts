@@ -32,7 +32,7 @@ class VideoService {
   async getSourceVideos(postId: number) {
     try {
       const response = await axiosInstance.get<
-        ApiResponse<IVideo.ISource.ISummary[]>
+        ApiResponse<IPagination.IOffset<IVideo.ISource.ISummary[]>>
       >(`/api/v1/posts/${postId}/videos`);
       return response.data;
     } catch (error) {

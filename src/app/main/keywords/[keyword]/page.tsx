@@ -197,7 +197,7 @@ export default function KeywordDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {newsItems.slice(0, 5).map((news, index) => (
               <Link
-                key={news.id || index}
+                key={news.sourceId || index}
                 href={news.url || "#"}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
               >
