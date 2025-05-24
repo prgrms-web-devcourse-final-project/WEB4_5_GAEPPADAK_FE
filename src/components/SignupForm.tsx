@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "@src/services/auth.service";
+import { AxiosError } from "axios";
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -17,7 +18,67 @@ const SignupForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // 개별 필드 에러 상태
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [nicknameError, setNicknameError] = useState("");
+
   const router = useRouter();
+
+  // 유효성 검사 함수들
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError("이메일 형식이 올바르지 않습니다.");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
+
+  const validatePassword = (password: string) => {
+    if (password.length < 8 || password.length > 20) {
+      setPasswordError("비밀번호는 8~20자 사이여야 합니다.");
+      return false;
+    }
+
+    const passwordRegex =
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/;
+    if (!passwordRegex.test(password)) {
+      setPasswordError("비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.");
+      return false;
+    }
+
+    setPasswordError("");
+    return true;
+  };
+
+  const validateNickname = (nickname: string) => {
+    if (nickname.length < 2 || nickname.length > 10) {
+      setNicknameError("닉네임은 2~10자 사이여야 합니다.");
+      return false;
+    }
+    setNicknameError("");
+    return true;
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (value) validateEmail(value);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    if (value) validatePassword(value);
+  };
+
+  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNickname(value);
+    if (value) validateNickname(value);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +86,16 @@ const SignupForm: React.FC = () => {
 
     if (!email || !password || !nickname || !year || !month || !day) {
       setError("모든 필드를 입력해주세요.");
+      return;
+    }
+
+    // 모든 유효성 검사 실행
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+    const isNicknameValid = validateNickname(nickname);
+
+    if (!isEmailValid || !isPasswordValid || !isNicknameValid) {
+      setError("입력 정보를 다시 확인해주세요.");
       return;
     }
 
@@ -41,7 +112,11 @@ const SignupForm: React.FC = () => {
       // 회원가입 성공 후 이메일 인증 페이지로 리다이렉트
       router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     } catch (err) {
-      setError("회원가입에 실패했습니다. 다시 시도해주세요.");
+      if (err instanceof AxiosError && err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("회원가입에 실패했습니다. 다시 시도해주세요.");
+      }
       console.error(err);
     } finally {
       setLoading(false);
@@ -53,14 +128,16 @@ const SignupForm: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
           <div className="text-center mb-8">
-            <div className="mx-auto w-20 h-20 relative mb-4">
-              <Image
-                src="/logo.svg"
-                alt="로고"
-                layout="fill"
-                objectFit="contain"
-                priority
-              />
+            <div className="mx-auto w-48 h-48 relative mb-8 rounded-full overflow-hidden bg-white shadow flex items-center justify-center">
+              <div className="relative w-36 h-36">
+                <Image
+                  src="/kkokkio.png"
+                  alt="로고"
+                  layout="fill"
+                  objectFit="contain"
+                  priority
+                />
+              </div>
             </div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               회원가입
@@ -115,11 +192,20 @@ const SignupForm: React.FC = () => {
                   autoComplete="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="py-3 pl-10 block w-full border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm"
+                  onChange={handleEmailChange}
+                  className={`py-3 pl-10 block w-full border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm ${
+                    emailError
+                      ? "border-red-500 dark:border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   placeholder="your@email.com"
                 />
               </div>
+              {emailError && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {emailError}
+                </p>
+              )}
             </div>
 
             <div>
@@ -150,8 +236,12 @@ const SignupForm: React.FC = () => {
                   autoComplete="new-password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="py-3 pl-10 pr-10 block w-full border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm"
+                  onChange={handlePasswordChange}
+                  className={`py-3 pl-10 pr-10 block w-full border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm ${
+                    passwordError
+                      ? "border-red-500 dark:border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   placeholder="********"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -190,6 +280,11 @@ const SignupForm: React.FC = () => {
                   </button>
                 </div>
               </div>
+              {passwordError && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {passwordError}
+                </p>
+              )}
             </div>
 
             <div>
@@ -219,11 +314,20 @@ const SignupForm: React.FC = () => {
                   type="text"
                   required
                   value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  className="py-3 pl-10 block w-full border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm"
+                  onChange={handleNicknameChange}
+                  className={`py-3 pl-10 block w-full border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-800 dark:text-white text-sm ${
+                    nicknameError
+                      ? "border-red-500 dark:border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   placeholder="닉네임"
                 />
               </div>
+              {nicknameError && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {nicknameError}
+                </p>
+              )}
             </div>
 
             <div>
