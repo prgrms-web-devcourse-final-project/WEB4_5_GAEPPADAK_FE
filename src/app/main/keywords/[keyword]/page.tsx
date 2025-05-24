@@ -85,8 +85,8 @@ export default function KeywordDetailPage() {
             >
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex gap-6">
                 {/* 썸네일 */}
-                <div className="w-24 h-24 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                  {post.thumbnailUrl ? (
+                {post.thumbnailUrl && (
+                  <div className="w-24 h-24 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                     <Image
                       src={post.thumbnailUrl}
                       alt={post.title}
@@ -94,14 +94,8 @@ export default function KeywordDetailPage() {
                       height={96}
                       className="rounded object-cover"
                     />
-                  ) : (
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      썸네일
-                      <br />
-                      이미지
-                    </span>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* 콘텐츠 */}
                 <div className="flex-1">
@@ -336,20 +330,16 @@ export default function KeywordDetailPage() {
                 href={news.url || "#"}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
               >
-                <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 relative flex items-center justify-center">
-                  {news.thumbnailUrl ? (
+                {news.thumbnailUrl && (
+                  <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 relative flex items-center justify-center">
                     <Image
                       src={news.thumbnailUrl}
                       alt={news.title || "뉴스 썸네일"}
                       fill
                       className="object-cover rounded-lg"
                     />
-                  ) : (
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      썸네일 이미지
-                    </span>
-                  )}
-                </div>
+                  </div>
+                )}
                 <p className="text-sm font-medium text-gray-900 dark:text-white text-center mb-2">
                   {news.source || "썸네일 이미지"}
                 </p>
