@@ -34,8 +34,9 @@ export default function PostDetailPage() {
   const [editText, setEditText] = useState("");
   const [reportingComment, setReportingComment] = useState<number | null>(null);
   const [reportingPost, setReportingPost] = useState<boolean>(false);
-  const [reportReason, setReportReason] =
-    useState<IComment.ReportReason | null>(null);
+  const [reportReason, setReportReason] = useState<
+    IComment.ReportReason | IPost.ReportReason | null
+  >(null);
 
   // Context에서 사용자 정보 가져오기
   const { currentUser, isLoggedIn } = useUser();
@@ -857,10 +858,23 @@ export default function PostDetailPage() {
                 <input
                   type="radio"
                   name="reportReason"
-                  value={IComment.ReportReason.BAD_CONTENT}
-                  checked={reportReason === IComment.ReportReason.BAD_CONTENT}
+                  value={
+                    reportingPost
+                      ? IPost.ReportReason.BAD_CONTENT
+                      : IComment.ReportReason.BAD_CONTENT
+                  }
+                  checked={
+                    reportReason ===
+                    (reportingPost
+                      ? IPost.ReportReason.BAD_CONTENT
+                      : IComment.ReportReason.BAD_CONTENT)
+                  }
                   onChange={(e) =>
-                    setReportReason(e.target.value as IComment.ReportReason)
+                    setReportReason(
+                      e.target.value as
+                        | IComment.ReportReason
+                        | IPost.ReportReason
+                    )
                   }
                   className="mr-3 cursor-pointer"
                 />
@@ -869,46 +883,85 @@ export default function PostDetailPage() {
                 </span>
               </label>
 
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="reportReason"
-                  value={IComment.ReportReason.RUDE_LANGUAGE}
-                  checked={reportReason === IComment.ReportReason.RUDE_LANGUAGE}
-                  onChange={(e) =>
-                    setReportReason(e.target.value as IComment.ReportReason)
-                  }
-                  className="mr-3 cursor-pointer"
-                />
-                <span className="text-gray-700 dark:text-gray-300">
-                  불쾌한 표현이 있습니다
-                </span>
-              </label>
+              {/* 댓글 신고에만 표시되는 옵션들 */}
+              {!reportingPost && (
+                <>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="reportReason"
+                      value={IComment.ReportReason.RUDE_LANGUAGE}
+                      checked={
+                        reportReason === IComment.ReportReason.RUDE_LANGUAGE
+                      }
+                      onChange={(e) =>
+                        setReportReason(e.target.value as IComment.ReportReason)
+                      }
+                      className="mr-3 cursor-pointer"
+                    />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      불쾌한 표현이 있습니다
+                    </span>
+                  </label>
+
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="reportReason"
+                      value={IComment.ReportReason.SPAM}
+                      checked={reportReason === IComment.ReportReason.SPAM}
+                      onChange={(e) =>
+                        setReportReason(e.target.value as IComment.ReportReason)
+                      }
+                      className="mr-3 cursor-pointer"
+                    />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      광고성 게시글입니다
+                    </span>
+                  </label>
+                </>
+              )}
+
+              {/* 포스트 신고에만 표시되는 옵션 */}
+              {reportingPost && (
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="reportReason"
+                    value={IPost.ReportReason.FALSE_INFO}
+                    checked={reportReason === IPost.ReportReason.FALSE_INFO}
+                    onChange={(e) =>
+                      setReportReason(e.target.value as IPost.ReportReason)
+                    }
+                    className="mr-3 cursor-pointer"
+                  />
+                  <span className="text-gray-700 dark:text-gray-300">
+                    잘못된 정보입니다
+                  </span>
+                </label>
+              )}
 
               <label className="flex items-center cursor-pointer">
                 <input
                   type="radio"
                   name="reportReason"
-                  value={IComment.ReportReason.SPAM}
-                  checked={reportReason === IComment.ReportReason.SPAM}
-                  onChange={(e) =>
-                    setReportReason(e.target.value as IComment.ReportReason)
+                  value={
+                    reportingPost
+                      ? IPost.ReportReason.ETC
+                      : IComment.ReportReason.ETC
                   }
-                  className="mr-3 cursor-pointer"
-                />
-                <span className="text-gray-700 dark:text-gray-300">
-                  광고성 게시글입니다
-                </span>
-              </label>
-
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="reportReason"
-                  value={IComment.ReportReason.ETC}
-                  checked={reportReason === IComment.ReportReason.ETC}
+                  checked={
+                    reportReason ===
+                    (reportingPost
+                      ? IPost.ReportReason.ETC
+                      : IComment.ReportReason.ETC)
+                  }
                   onChange={(e) =>
-                    setReportReason(e.target.value as IComment.ReportReason)
+                    setReportReason(
+                      e.target.value as
+                        | IComment.ReportReason
+                        | IPost.ReportReason
+                    )
                   }
                   className="mr-3 cursor-pointer"
                 />
