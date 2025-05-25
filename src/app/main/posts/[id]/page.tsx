@@ -43,7 +43,7 @@ export default function PostDetailPage() {
 
   // 현재 사용자가 댓글 작성자인지 확인
   const isMyComment = (commentNickname: string) => {
-    return currentUser?.data?.nickname === commentNickname;
+    return currentUser?.nickname === commentNickname;
   };
 
   // 댓글 신고 모달 열기

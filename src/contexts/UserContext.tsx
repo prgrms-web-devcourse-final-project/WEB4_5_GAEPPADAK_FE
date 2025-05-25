@@ -32,7 +32,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const refreshUser = async () => {
     try {
       const userData = await memberService.getMe();
-      setCurrentUser(userData);
+      setCurrentUser(userData.data);
       setIsLoggedIn(true);
     } catch (error) {
       console.error("Failed to fetch current user:", error);

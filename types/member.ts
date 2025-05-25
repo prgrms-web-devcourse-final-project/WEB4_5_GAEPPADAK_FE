@@ -1,15 +1,13 @@
 export namespace IMember {
+  export type roleType = "USER" | "ADMIN";
+
   export interface Me {
-    code: string;
+    nickname: string;
 
-    message: string;
+    email: string;
 
-    data: {
-      nickname: string;
+    birthDate: string;
 
-      email: string;
-
-      birthDate: string;
-    };
+    role: roleType;
   }
 }

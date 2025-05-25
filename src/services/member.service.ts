@@ -1,10 +1,11 @@
-import { IMember } from "../../types";
+import { ApiResponse, IMember } from "../../types";
 import { axiosInstance } from "./axios.instance";
 
 class MemberService {
-  async getMe(): Promise<IMember.Me> {
+  async getMe(): Promise<ApiResponse<IMember.Me>> {
     try {
-      const response = await axiosInstance.get<IMember.Me>("api/v1/members/me");
+      const response =
+        await axiosInstance.get<ApiResponse<IMember.Me>>("api/v1/members/me");
       return response.data;
     } catch (error) {
       console.error(error);

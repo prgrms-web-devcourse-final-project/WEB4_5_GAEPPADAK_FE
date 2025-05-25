@@ -35,12 +35,12 @@ export default function ProfileEditPage() {
       return;
     }
 
-    if (currentUser?.data) {
+    if (currentUser) {
       // 기존 사용자 정보로 폼 초기화
-      const birthDate = new Date(currentUser.data.birthDate);
+      const birthDate = new Date(currentUser.birthDate);
       setFormData({
-        nickname: currentUser.data.nickname,
-        email: currentUser.data.email,
+        nickname: currentUser.nickname,
+        email: currentUser.email,
         birthYear: birthDate.getFullYear().toString(),
         birthMonth: (birthDate.getMonth() + 1).toString().padStart(2, "0"),
         birthDay: birthDate.getDate().toString().padStart(2, "0"),
@@ -245,7 +245,7 @@ export default function ProfileEditPage() {
     return <LoadingSpinner />;
   }
 
-  if (!currentUser?.data) {
+  if (!currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
