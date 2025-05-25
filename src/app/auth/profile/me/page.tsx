@@ -23,10 +23,6 @@ export default function ProfileEditPage() {
     confirmPassword: "",
   });
 
-  // 프로필 이미지
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [profileImagePreview, setProfileImagePreview] = useState<string>("");
-
   // 에러 상태
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -70,19 +66,6 @@ export default function ProfileEditPage() {
     }
   };
 
-  // 프로필 이미지 변경 처리
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfileImage(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // 폼 검증
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -121,7 +104,6 @@ export default function ProfileEditPage() {
     try {
       // TODO: API 호출로 프로필 업데이트
       console.log("프로필 업데이트:", formData);
-      console.log("프로필 이미지:", profileImage);
 
       alert("프로필이 성공적으로 업데이트되었습니다.");
       setIsEditing(false);
@@ -198,12 +180,6 @@ export default function ProfileEditPage() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
           {/* 회원 정보 수정 섹션 */}
           <div className="mb-8">
-            <div className="flex items-center mb-6">
-              <span className="px-3 py-1 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full text-sm font-medium">
-                회원 정보 수정
-              </span>
-            </div>
-
             {/* 닉네임 */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -232,7 +208,7 @@ export default function ProfileEditPage() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                disabled={!isEditing}
+                disabled={true}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               {errors.email && (
@@ -255,7 +231,7 @@ export default function ProfileEditPage() {
                   onChange={(e) =>
                     handleInputChange("birthYear", e.target.value)
                   }
-                  disabled={!isEditing}
+                  disabled={true}
                   className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <input
@@ -265,7 +241,7 @@ export default function ProfileEditPage() {
                   onChange={(e) =>
                     handleInputChange("birthMonth", e.target.value)
                   }
-                  disabled={!isEditing}
+                  disabled={true}
                   className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <input
@@ -275,7 +251,7 @@ export default function ProfileEditPage() {
                   onChange={(e) =>
                     handleInputChange("birthDay", e.target.value)
                   }
-                  disabled={!isEditing}
+                  disabled={true}
                   className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -326,59 +302,6 @@ export default function ProfileEditPage() {
                 <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                   {errors.confirmPassword}
                 </p>
-              )}
-            </div>
-          </div>
-
-          {/* 프로필 이미지 섹션 */}
-          <div className="mb-8 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
-            <div className="text-center">
-              <div className="mb-4">
-                {profileImagePreview ? (
-                  <div className="w-24 h-24 mx-auto rounded-full overflow-hidden">
-                    <Image
-                      src={profileImagePreview}
-                      alt="프로필 미리보기"
-                      width={96}
-                      height={96}
-                      className="object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-24 h-24 mx-auto rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                    <svg
-                      className="w-12 h-12 text-gray-400 dark:text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                v2
-              </div>
-
-              {isEditing && (
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                  <span className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                    이미지 선택
-                  </span>
-                </label>
               )}
             </div>
           </div>
