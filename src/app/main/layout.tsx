@@ -3,7 +3,6 @@
 import { ReactNode } from "react";
 import Navigation from "@/src/components/navigation/Header";
 import KeywordSidebar from "@/src/components/sidebar/KeywordList";
-import { UserProvider } from "@/src/contexts/UserContext";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -11,26 +10,24 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
-    <UserProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navigation />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Navigation />
 
-        <main>
-          <div className="flex max-w-7xl mx-auto">
-            <div className="flex-1 min-w-0 max-w-4xl">
-              <div className="container mx-auto px-6 py-8 overflow-hidden">
-                {children}
-              </div>
+      <main>
+        <div className="flex max-w-7xl mx-auto">
+          <div className="flex-1 min-w-0 max-w-4xl">
+            <div className="container mx-auto px-6 py-8 overflow-hidden">
+              {children}
             </div>
-
-            <aside className="w-80 pl-8 hidden lg:block flex-shrink-0">
-              <div className="sticky top-24">
-                <KeywordSidebar />
-              </div>
-            </aside>
           </div>
-        </main>
-      </div>
-    </UserProvider>
+
+          <aside className="w-80 pl-8 hidden lg:block flex-shrink-0">
+            <div className="sticky top-24">
+              <KeywordSidebar />
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
   );
 }
