@@ -123,6 +123,15 @@ class AuthService {
       throw e;
     }
   }
+
+  async deleteAccount(): Promise<void> {
+    try {
+      await axiosInstance.delete<ApiResponse<void>>("/api/v1/members/me");
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 export const authService = new AuthService();

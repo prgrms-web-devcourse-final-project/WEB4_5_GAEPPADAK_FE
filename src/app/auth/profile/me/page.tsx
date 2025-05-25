@@ -12,6 +12,7 @@ export default function ProfileEditPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // 폼 데이터
   const [formData, setFormData] = useState({
@@ -125,18 +126,25 @@ export default function ProfileEditPage() {
     }
   };
 
+  // 회원 탈퇴 모달 열기
+  const openDeleteModal = () => {
+    setShowDeleteModal(true);
+  };
+
+  // 회원 탈퇴 모달 닫기
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+  };
+
   // 회원 탈퇴 처리
   const handleDeleteAccount = async () => {
-    if (
-      !confirm("정말로 회원 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.")
-    ) {
-      return;
-    }
-
+    setShowDeleteModal(false);
     setLoading(true);
+
     try {
-      // TODO: API 호출로 회원 탈퇴
-      console.log("회원 탈퇴");
+      // 회원 탈퇴 API 호출
+
+      await authService.deleteAccount();
 
       alert("회원 탈퇴가 완료되었습니다.");
       router.push("/main");
@@ -319,8 +327,9 @@ export default function ProfileEditPage() {
           {/* 하단 버튼들 */}
           <div className="flex gap-4">
             <button
-              onClick={handleDeleteAccount}
-              className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors cursor-pointer font-medium"
+              onClick={openDeleteModal}
+              disabled={loading}
+              className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors cursor-pointer font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               회원 탈퇴
             </button>
@@ -330,14 +339,16 @@ export default function ProfileEditPage() {
             {isEditing ? (
               <button
                 onClick={handleSubmit}
-                className="px-8 py-3 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors cursor-pointer font-medium"
+                disabled={loading}
+                className="px-8 py-3 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors cursor-pointer font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 확인
               </button>
             ) : (
               <button
                 onClick={() => router.push("/main")}
-                className="px-8 py-3 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors cursor-pointer font-medium"
+                disabled={loading}
+                className="px-8 py-3 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors cursor-pointer font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 뒤로 가기
               </button>
@@ -345,6 +356,35 @@ export default function ProfileEditPage() {
           </div>
         </div>
       </div>
+
+      {/* 회원 탈퇴 확인 모달 */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              회원 탈퇴 확인
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              정말로 회원 탈퇴하시겠습니까?
+              <br />이 작업은 되돌릴 수 없습니다.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
+              >
+                탈퇴하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
