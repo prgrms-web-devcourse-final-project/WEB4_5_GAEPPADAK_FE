@@ -135,7 +135,7 @@ export default function PostsManagementPage() {
               onChange={(e) =>
                 handleSearchTargetChange(e.target.value as IPost.SearchTarget)
               }
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
               <option value="post_title">포스트 제목</option>
               <option value="post_summary">포스트 내용</option>

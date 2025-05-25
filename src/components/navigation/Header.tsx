@@ -119,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() =>
                     setShowManagementDropdown(!showManagementDropdown)
                   }
-                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer flex items-center gap-2"
                 >
                   관리 목록
                   <svg
@@ -143,21 +143,21 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="py-2">
                       <Link
                         href="/main/management/posts"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
                         onClick={() => setShowManagementDropdown(false)}
                       >
                         포스트
                       </Link>
                       <Link
                         href="/main/management/comments"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
                         onClick={() => setShowManagementDropdown(false)}
                       >
                         댓글
                       </Link>
                       <Link
                         href="/main/management/members"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
                         onClick={() => setShowManagementDropdown(false)}
                       >
                         회원
