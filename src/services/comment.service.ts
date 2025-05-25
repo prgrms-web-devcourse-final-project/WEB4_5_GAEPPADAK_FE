@@ -77,6 +77,23 @@ export class CommentService {
       throw error;
     }
   }
+
+  async reportComment(
+    commentId: number,
+    reason: string
+  ): Promise<ApiResponse<void>> {
+    try {
+      const response = await axiosInstance.post<
+        ApiResponse<void>,
+        AxiosResponse<ApiResponse<void>>,
+        IComment.ReportDto
+      >(`/api/v1/reports/comments/${commentId}`, { reason });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export const commentService = new CommentService();

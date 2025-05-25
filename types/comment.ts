@@ -44,4 +44,8 @@ export namespace IComment {
 
     sort!: "likeCount,DESC" | "createdAt,DESC";
   }
+
+  export class ReportDto {
+    reason!: string;
+  }
 }
