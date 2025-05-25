@@ -87,7 +87,7 @@ export class CommentService {
         ApiResponse<void>,
         AxiosResponse<ApiResponse<void>>,
         IComment.ReportDto
-      >(`/api/v1/reports/comments/${commentId}`, { reason });
+      >(`/api/v2/reports/comments/${commentId}`, { reason });
       return response.data;
     } catch (error) {
       console.error(error);
