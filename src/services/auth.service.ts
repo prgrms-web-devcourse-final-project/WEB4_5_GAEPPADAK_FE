@@ -3,11 +3,13 @@ import { axiosInstance } from "./axios.instance";
 import { AxiosResponse } from "axios";
 
 class AuthService {
-  async signup(signupDto: IAuth.SignUpDto): Promise<IAuth.SignUpResponse> {
-    const response = await axiosInstance.post<IAuth.SignUpResponse>(
-      "api/v1/members/signup",
-      signupDto
-    );
+  async signup(
+    signupDto: IAuth.SignUpDto
+  ): Promise<ApiResponse<IAuth.SignUpResponse>> {
+    const response = await axiosInstance.post<
+      ApiResponse<IAuth.SignUpResponse>
+    >("api/v1/members/signup", signupDto);
+
     try {
       return response.data;
     } catch (error) {
@@ -16,11 +18,12 @@ class AuthService {
     }
   }
 
-  async signin(signinDto: IAuth.SignInDto): Promise<IAuth.SignInResponse> {
-    const response = await axiosInstance.post<IAuth.SignInResponse>(
-      "api/v1/auth/login",
-      signinDto
-    );
+  async signin(
+    signinDto: IAuth.SignInDto
+  ): Promise<ApiResponse<IAuth.SignInResponse>> {
+    const response = await axiosInstance.post<
+      ApiResponse<IAuth.SignInResponse>
+    >("api/v1/auth/login", signinDto);
     try {
       return response.data;
     } catch (error) {

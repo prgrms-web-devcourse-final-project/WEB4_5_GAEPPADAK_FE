@@ -16,37 +16,25 @@ export namespace IAuth {
   }
 
   export interface SignUpResponse {
-    code: string;
+    email: string;
 
-    message: string;
+    nickname: string;
 
-    data: {
-      email: string;
+    birthDate: string;
 
-      nickname: string;
-
-      birthDate: string;
-
-      role: string;
-    };
+    role: string;
   }
 
   export interface SignInResponse {
-    code: string;
+    id: string;
 
-    message: string;
+    nickname: string;
 
-    data: {
-      id: string;
+    email: string;
 
-      nickname: string;
+    deleteAt: string | null;
 
-      email: string;
-
-      deleteAt: string | null;
-
-      role: string;
-    };
+    role: string;
   }
 
   export class CheckEmailDto {
