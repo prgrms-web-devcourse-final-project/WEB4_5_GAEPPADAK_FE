@@ -16,37 +16,25 @@ export namespace IAuth {
   }
 
   export interface SignUpResponse {
-    code: string;
+    email: string;
 
-    message: string;
+    nickname: string;
 
-    data: {
-      email: string;
+    birthDate: string;
 
-      nickname: string;
-
-      birthDate: string;
-
-      role: string;
-    };
+    role: string;
   }
 
   export interface SignInResponse {
-    code: string;
+    id: string;
 
-    message: string;
+    nickname: string;
 
-    data: {
-      id: string;
+    email: string;
 
-      nickname: string;
+    deleteAt: string | null;
 
-      email: string;
-
-      deleteAt: string | null;
-
-      role: string;
-    };
+    role: string;
   }
 
   export class CheckEmailDto {
@@ -59,5 +47,15 @@ export namespace IAuth {
     email!: string;
 
     newPassword!: string;
+  }
+
+  export class CheckPasswordDto {
+    password!: string;
+  }
+
+  export class PatchProfileDto {
+    nickname?: string;
+
+    password?: string;
   }
 }
