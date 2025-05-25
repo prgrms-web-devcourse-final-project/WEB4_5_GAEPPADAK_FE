@@ -111,6 +111,15 @@ class AuthService {
       throw e;
     }
   }
+
+  async patchProfile(body: IAuth.PatchProfileDto): Promise<void> {
+    try {
+      await axiosInstance.patch<ApiResponse<void>>("/api/v1/members/me", body);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 export const authService = new AuthService();

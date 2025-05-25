@@ -64,4 +64,10 @@ export namespace IAuth {
   export class CheckPasswordDto {
     password!: string;
   }
+
+  export class PatchProfileDto {
+    nickname?: string;
+
+    password?: string;
+  }
 }
