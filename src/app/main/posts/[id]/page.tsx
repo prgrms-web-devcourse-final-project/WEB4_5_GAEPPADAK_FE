@@ -33,6 +33,7 @@ export default function PostDetailPage() {
   const [editingComment, setEditingComment] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [reportingComment, setReportingComment] = useState<number | null>(null);
+  const [reportingPost, setReportingPost] = useState<boolean>(false);
   const [reportReason, setReportReason] =
     useState<IComment.ReportReason | null>(null);
 
@@ -50,9 +51,16 @@ export default function PostDetailPage() {
     setReportReason(null);
   };
 
+  // 포스트 신고 모달 열기
+  const openPostReportModal = () => {
+    setReportingPost(true);
+    setReportReason(null);
+  };
+
   // 댓글 신고 모달 닫기
   const closeReportModal = () => {
     setReportingComment(null);
+    setReportingPost(false);
     setReportReason(null);
   };
 
@@ -69,6 +77,23 @@ export default function PostDetailPage() {
       closeReportModal();
     } catch (error) {
       console.error("Error reporting comment:", error);
+      alert("신고 처리에 실패했습니다.");
+    }
+  };
+
+  // 포스트 신고 처리
+  const handleReportPost = async () => {
+    if (!reportReason) {
+      alert("신고 사유를 선택해주세요.");
+      return;
+    }
+
+    try {
+      await postService.reportPost(postId, reportReason as IPost.ReportReason);
+      alert("신고가 접수되었습니다.");
+      closeReportModal();
+    } catch (error) {
+      console.error("Error reporting post:", error);
       alert("신고 처리에 실패했습니다.");
     }
   };
@@ -378,10 +403,23 @@ export default function PostDetailPage() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
           {/* 포스트 헤더 */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <span className="inline-block px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300 mb-4">
-              {post.keyword}
-            </span>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <div className="flex justify-between items-start mb-4">
+              <span className="inline-block px-3 py-1 text-sm font-medium text-blue-700 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                {post.keyword}
+              </span>
+
+              {/* 포스트 신고 버튼 */}
+              {isLoggedIn && (
+                <button
+                  onClick={openPostReportModal}
+                  className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors cursor-pointer"
+                >
+                  신고
+                </button>
+              )}
+            </div>
+
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {post.title}
             </h1>
           </div>
@@ -807,11 +845,11 @@ export default function PostDetailPage() {
       </div>
 
       {/* 댓글 신고 모달 */}
-      {reportingComment && (
+      {(reportingComment || reportingPost) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              댓글 신고 모달
+              {reportingPost ? "포스트 신고 모달" : "댓글 신고 모달"}
             </h3>
 
             <div className="space-y-3 mb-6">
@@ -886,7 +924,7 @@ export default function PostDetailPage() {
                 취소
               </button>
               <button
-                onClick={handleReportComment}
+                onClick={reportingPost ? handleReportPost : handleReportComment}
                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
               >
                 신고하기
