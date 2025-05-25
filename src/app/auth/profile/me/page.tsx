@@ -35,12 +35,12 @@ export default function ProfileEditPage() {
       return;
     }
 
-    if (currentUser?.data) {
+    if (currentUser) {
       // 기존 사용자 정보로 폼 초기화
-      const birthDate = new Date(currentUser.data.birthDate);
+      const birthDate = new Date(currentUser.birthDate);
       setFormData({
-        nickname: currentUser.data.nickname,
-        email: currentUser.data.email,
+        nickname: currentUser.nickname,
+        email: currentUser.email,
         birthYear: birthDate.getFullYear().toString(),
         birthMonth: (birthDate.getMonth() + 1).toString().padStart(2, "0"),
         birthDay: birthDate.getDate().toString().padStart(2, "0"),
@@ -66,30 +66,116 @@ export default function ProfileEditPage() {
         [field]: "",
       }));
     }
+
+    // 실시간 검증
+    if (field === "nickname" && value.trim()) {
+      validateNickname(value);
+    } else if (field === "newPassword" && value.trim()) {
+      validatePassword(value);
+    } else if (field === "confirmPassword" && value.trim()) {
+      validatePasswordConfirm(value);
+    }
+  };
+
+  // 실시간 닉네임 검증
+  const validateNickname = (nickname: string) => {
+    if (nickname.length < 2 || nickname.length > 10) {
+      setErrors((prev) => ({
+        ...prev,
+        nickname: "닉네임은 2~10자 사이여야 합니다.",
+      }));
+      return false;
+    }
+    setErrors((prev) => ({
+      ...prev,
+      nickname: "",
+    }));
+    return true;
+  };
+
+  // 실시간 비밀번호 검증
+  const validatePassword = (password: string) => {
+    if (password.length < 8 || password.length > 20) {
+      setErrors((prev) => ({
+        ...prev,
+        newPassword: "비밀번호는 8~20자 사이여야 합니다.",
+      }));
+      return false;
+    }
+
+    const passwordRegex =
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/;
+    if (!passwordRegex.test(password)) {
+      setErrors((prev) => ({
+        ...prev,
+        newPassword: "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.",
+      }));
+      return false;
+    }
+
+    setErrors((prev) => ({
+      ...prev,
+      newPassword: "",
+    }));
+    return true;
+  };
+
+  // 실시간 비밀번호 확인 검증
+  const validatePasswordConfirm = (confirmPassword: string) => {
+    if (formData.newPassword !== confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: "비밀번호가 일치하지 않습니다.",
+      }));
+      return false;
+    }
+    setErrors((prev) => ({
+      ...prev,
+      confirmPassword: "",
+    }));
+    return true;
   };
 
   // 폼 검증
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
+    // 닉네임 검증 (2-10자)
     if (!formData.nickname.trim()) {
       newErrors.nickname = "닉네임을 입력해주세요.";
+    } else if (formData.nickname.length < 2 || formData.nickname.length > 10) {
+      newErrors.nickname = "닉네임은 2~10자 사이여야 합니다.";
     }
 
+    // 이메일 검증 (사용하지 않지만 기존 로직 유지)
     if (!formData.email.trim()) {
       newErrors.email = "이메일을 입력해주세요.";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "올바른 이메일 형식이 아닙니다.";
     }
 
+    // 생년월일 검증 (사용하지 않지만 기존 로직 유지)
     if (!formData.birthYear || !formData.birthMonth || !formData.birthDay) {
       newErrors.birth = "생년월일을 모두 입력해주세요.";
     }
 
-    if (formData.newPassword && formData.newPassword.length < 6) {
-      newErrors.newPassword = "비밀번호는 6자 이상이어야 합니다.";
+    // 새 비밀번호 검증 (입력된 경우에만)
+    if (formData.newPassword.trim()) {
+      // 비밀번호 길이 검증 (8-20자)
+      if (formData.newPassword.length < 8 || formData.newPassword.length > 20) {
+        newErrors.newPassword = "비밀번호는 8~20자 사이여야 합니다.";
+      } else {
+        // 비밀번호 복잡성 검증 (영문, 숫자, 특수문자 포함)
+        const passwordRegex =
+          /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/;
+        if (!passwordRegex.test(formData.newPassword)) {
+          newErrors.newPassword =
+            "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.";
+        }
+      }
     }
 
+    // 비밀번호 확인 검증
     if (formData.newPassword !== formData.confirmPassword) {
       newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
     }
@@ -159,7 +245,7 @@ export default function ProfileEditPage() {
     return <LoadingSpinner />;
   }
 
-  if (!currentUser?.data) {
+  if (!currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

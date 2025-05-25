@@ -6,6 +6,7 @@ import { newsService } from "@src/services/news.service";
 import { videoService } from "@src/services/video.service";
 import { postService } from "@src/services/post.service";
 import { INews, IVideo, IPost } from "@/types";
+import { useUser } from "@/src/contexts/UserContext";
 
 // UI 컴포넌트 임포트
 import LoadingSpinner from "@src/components/ui/LoadingSpinner";
@@ -20,6 +21,9 @@ export default function Home() {
   const [videos, setVideos] = useState<IVideo.ISummary[]>([]);
   const [posts, setPosts] = useState<IPost.ISummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+
+  // 사용자 정보 가져오기
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +47,24 @@ export default function Home() {
 
     fetchData();
   }, []);
+
+  // 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".management-dropdown")) {
+        setShowManagementDropdown(false);
+      }
+    };
+
+    if (showManagementDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showManagementDropdown]);
 
   if (loading) {
     return <LoadingSpinner />;
@@ -137,6 +159,8 @@ export default function Home() {
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             인기 유튜브
           </h2>
+
+          {/* 관리자인 경우 관리 탭 드롭다운 표시 */}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {videos.length > 0 ? (

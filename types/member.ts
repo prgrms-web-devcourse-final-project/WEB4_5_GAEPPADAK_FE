@@ -1,15 +1,31 @@
 export namespace IMember {
-  export interface Me {
-    code: string;
+  export type roleType = "USER" | "ADMIN";
 
-    message: string;
+  export interface IBase {
+    email: string;
 
-    data: {
-      nickname: string;
+    role: roleType;
+  }
 
-      email: string;
+  export interface Me extends IBase {
+    nickname: string;
 
-      birthDate: string;
-    };
+    birthDate: string;
+  }
+
+  export interface ISummaryForAdmin extends IBase {
+    memberId: string;
+
+    nickname: string;
+  }
+
+  export class GetListQueryDtoForAdmin {
+    page!: number;
+
+    size!: number;
+
+    searchTarget!: "email" | "nickname" | "role";
+
+    searchValue!: string;
   }
 }

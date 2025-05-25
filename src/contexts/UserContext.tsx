@@ -13,6 +13,7 @@ import { memberService } from "@/src/services/member.service";
 interface UserContextType {
   currentUser: IMember.Me | null;
   isLoggedIn: boolean;
+  loading: boolean;
   updateUser: (user: IMember.Me | null) => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -27,17 +28,22 @@ interface UserProviderProps {
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<IMember.Me | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // 사용자 정보 새로고침
   const refreshUser = async () => {
     try {
+      setLoading(true);
       const userData = await memberService.getMe();
-      setCurrentUser(userData);
+      console.log(userData.data);
+      setCurrentUser(userData.data);
       setIsLoggedIn(true);
     } catch (error) {
       console.error("Failed to fetch current user:", error);
       setCurrentUser(null);
       setIsLoggedIn(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,6 +69,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       value={{
         currentUser,
         isLoggedIn,
+        loading,
         updateUser,
         logout,
         refreshUser,

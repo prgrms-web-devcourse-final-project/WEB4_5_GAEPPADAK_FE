@@ -16,7 +16,8 @@ export const Header: React.FC<HeaderProps> = ({
   const [activeTab, setActiveTab] = useState(initialActiveTab);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const { currentUser, isLoggedIn, logout: contextLogout } = useUser();
+  const [showManagementDropdown, setShowManagementDropdown] = useState(false);
+  const { currentUser, isLoggedIn, loading, logout: contextLogout } = useUser();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -30,6 +31,24 @@ export const Header: React.FC<HeaderProps> = ({
       setActiveTab("video");
     }
   }, [pathname]);
+
+  // 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".management-dropdown")) {
+        setShowManagementDropdown(false);
+      }
+    };
+
+    if (showManagementDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showManagementDropdown]);
 
   // 탭 클릭 처리
   const handleTabClick = (tab: string, path: string) => {
@@ -93,6 +112,62 @@ export const Header: React.FC<HeaderProps> = ({
               />
             </nav>
 
+            {/* 관리자 드롭다운 */}
+            {!loading && isLoggedIn && currentUser?.role === "ADMIN" && (
+              <div className="relative management-dropdown">
+                <button
+                  onClick={() =>
+                    setShowManagementDropdown(!showManagementDropdown)
+                  }
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer flex items-center gap-2"
+                >
+                  관리 목록
+                  <svg
+                    className={`w-4 h-4 transition-transform ${showManagementDropdown ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* 드롭다운 메뉴 */}
+                {showManagementDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                    <div className="py-2">
+                      <Link
+                        href="/main/management/posts"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => setShowManagementDropdown(false)}
+                      >
+                        포스트
+                      </Link>
+                      <Link
+                        href="/main/management/comments"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => setShowManagementDropdown(false)}
+                      >
+                        댓글
+                      </Link>
+                      <Link
+                        href="/main/management/members"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
+                        onClick={() => setShowManagementDropdown(false)}
+                      >
+                        회원
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* 검색바 */}
             <form onSubmit={handleSearch} className="flex-1 max-w-md mx-4">
               <div className="relative">
@@ -126,7 +201,10 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* 사용자 메뉴 */}
             <div className="flex items-center space-x-3">
-              {isLoggedIn ? (
+              {loading ? (
+                // 로딩 중일 때는 빈 공간 표시
+                <div className="w-32 h-8"></div>
+              ) : isLoggedIn ? (
                 <>
                   <button
                     onClick={handleLogout}

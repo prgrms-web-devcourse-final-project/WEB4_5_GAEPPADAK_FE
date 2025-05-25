@@ -94,6 +94,18 @@ export class CommentService {
       throw error;
     }
   }
+
+  async getReportedComments(query: IComment.GetListQueryDtoForAdmin) {
+    try {
+      const response = await axiosInstance.get<
+        ApiResponse<IPagination.IOffset<IComment.ISummaryForAdmin[]>>
+      >(`/api/v2/admin/reports/comments`, { params: query });
+      return response.data.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export const commentService = new CommentService();

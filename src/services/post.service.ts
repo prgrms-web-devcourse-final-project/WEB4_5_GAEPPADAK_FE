@@ -54,6 +54,20 @@ class PostService {
       throw error;
     }
   }
+
+  async getReportedPosts(query: IPost.GetListQueryDtoForAdmin) {
+    try {
+      const response = await axiosInstance.get<
+        ApiResponse<IPagination.IOffset<IPost.ISummaryForAdmin[]>>
+      >(`/api/v2/admin/reports/posts`, {
+        params: query,
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export const postService = new PostService();
