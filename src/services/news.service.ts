@@ -32,7 +32,7 @@ class NewsService {
   async getSourceNews(postId: number) {
     try {
       const response = await axiosInstance.get<
-        ApiResponse<INews.ISource.ISummary[]>
+        ApiResponse<IPagination.IOffset<INews.ISource.ISummaryForPost[]>>
       >(`/api/v1/posts/${postId}/news`);
       return response.data;
     } catch (error) {

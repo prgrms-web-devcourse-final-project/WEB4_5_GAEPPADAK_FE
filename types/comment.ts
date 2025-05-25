@@ -12,9 +12,19 @@ export interface IComment {
   createdAt: string;
 
   profileUrl: string;
+
+  isLiked: boolean;
 }
 
 export namespace IComment {
+  export enum ReportReason {
+    BAD_CONTENT = "BAD_CONTENT",
+    RUDE_LANGUAGE = "RUDE_LANGUAGE",
+    SPAM = "SPAM",
+    FALSE_INFO = "FALSE_INFO",
+    ETC = "ETC",
+  }
+
   export interface ILike {
     id: number;
 
@@ -41,5 +51,9 @@ export namespace IComment {
     size!: number;
 
     sort!: "likeCount,DESC" | "createdAt,DESC";
+  }
+
+  export class ReportDto {
+    reason!: ReportReason;
   }
 }

@@ -1,6 +1,12 @@
 export interface IPost extends IPost.IBase {}
 
 export namespace IPost {
+  export enum ReportReason {
+    BAD_CONTENT = "BAD_CONTENT",
+    FALSE_INFO = "FALSE_INFO",
+    ETC = "ETC",
+  }
+
   export interface IBase {
     postId: number;
     keyword: string;

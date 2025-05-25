@@ -19,7 +19,7 @@ export namespace INews {
 
   export namespace ISource {
     export interface ISummary {
-      id: number;
+      sourceId: number;
 
       url: string;
 
@@ -30,6 +30,16 @@ export namespace INews {
       platform: "YOUTUBE" | "NAVER_NEWS";
 
       source: string;
+    }
+
+    export interface ISummaryForPost {
+      sourceId: number;
+
+      url: string;
+
+      thumbnailUrl: string;
+
+      title: string;
     }
 
     export class GetMixedListQueryDto {

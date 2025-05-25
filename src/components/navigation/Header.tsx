@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import NavTab from "@src/components/ui/NavTab";
-import { memberService } from "@src/services/member.service";
 import { authService } from "@src/services/auth.service";
-import { IMember } from "@/types";
+import { useUser } from "@/src/contexts/UserContext";
 
 interface HeaderProps {
   initialActiveTab?: string;
@@ -14,26 +13,9 @@ export const Header: React.FC<HeaderProps> = ({
   initialActiveTab = "home",
 }) => {
   const [activeTab, setActiveTab] = useState(initialActiveTab);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState<IMember.Me | null>(null);
+  const { currentUser, isLoggedIn, logout: contextLogout } = useUser();
   const router = useRouter();
   const pathname = usePathname();
-
-  // 사용자 정보 가져오기
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const data = await memberService.getMe();
-        setUserInfo(data);
-        setIsLoggedIn(true);
-      } catch (error) {
-        console.error("사용자 정보를 가져오는데 실패했습니다:", error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
 
   // 경로에 따라 활성 탭 설정
   useEffect(() => {
@@ -56,8 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleLogout = async () => {
     try {
       await authService.signout();
-      setIsLoggedIn(false);
-      setUserInfo(null);
+      contextLogout(); // Context의 로그아웃 함수 호출
       router.push("/main");
     } catch (error) {
       console.error("로그아웃 실패:", error);
@@ -90,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
               <>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 rounded-full text-sm text-white bg-blue-600 hover:bg-blue-700"
+                  className="px-4 py-2 rounded-full text-sm text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
                 >
                   로그아웃
                 </button>

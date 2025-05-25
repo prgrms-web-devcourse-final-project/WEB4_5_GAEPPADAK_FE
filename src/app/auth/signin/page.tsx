@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "../../../services/auth.service";
 import { IAuth } from "../../../../types";
+import { AxiosError } from "axios";
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -42,7 +43,11 @@ const SignIn: React.FC = () => {
         router.push("/main");
       }, 2000);
     } catch (err) {
-      setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+      if (err instanceof AxiosError && err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+      }
       console.error(err);
     } finally {
       setLoading(false);
@@ -258,7 +263,7 @@ const SignIn: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 cursor-pointer ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
               >
                 {loading ? (
                   <>

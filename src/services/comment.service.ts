@@ -66,6 +66,34 @@ export class CommentService {
       throw error;
     }
   }
+
+  async unlikeComment(commentId: number) {
+    try {
+      await axiosInstance.delete<ApiResponse<void>>(
+        `/api/v1/comments/${commentId}/like`
+      );
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async reportComment(
+    commentId: number,
+    reason: IComment.ReportReason
+  ): Promise<ApiResponse<void>> {
+    try {
+      const response = await axiosInstance.post<
+        ApiResponse<void>,
+        AxiosResponse<ApiResponse<void>>,
+        IComment.ReportDto
+      >(`/api/v2/reports/comments/${commentId}`, { reason });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export const commentService = new CommentService();
