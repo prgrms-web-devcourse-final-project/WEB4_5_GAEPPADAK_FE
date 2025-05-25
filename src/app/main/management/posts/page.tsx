@@ -10,6 +10,7 @@ export default function PostsManagementPage() {
   const [selectedPosts, setSelectedPosts] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [query, setQuery] = useState<IPost.GetListQueryDtoForAdmin>({
     page: 1,
     size: 10,
@@ -81,6 +82,122 @@ export default function PostsManagementPage() {
       setSelectedPosts(new Set());
     } else {
       setSelectedPosts(new Set(posts.map((post) => post.keywordId)));
+    }
+  };
+
+  // 개별 신고 승인
+  const handleApproveReport = async (postId: number) => {
+    try {
+      setActionLoading(postId);
+      // TODO: API 호출 - postService.approveReport(postId)
+      console.log("신고 승인:", postId);
+
+      // 상태 업데이트
+      setPosts((prev) =>
+        prev.map((post) =>
+          post.keywordId === postId ? { ...post, status: "APPROVED" } : post
+        )
+      );
+
+      alert("신고가 승인되었습니다.");
+    } catch (error) {
+      console.error("신고 승인 실패:", error);
+      alert("신고 승인에 실패했습니다.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // 개별 신고 거부
+  const handleRejectReport = async (postId: number) => {
+    try {
+      setActionLoading(postId);
+      // TODO: API 호출 - postService.rejectReport(postId)
+      console.log("신고 거부:", postId);
+
+      // 상태 업데이트
+      setPosts((prev) =>
+        prev.map((post) =>
+          post.keywordId === postId ? { ...post, status: "REJECTED" } : post
+        )
+      );
+
+      alert("신고가 거부되었습니다.");
+    } catch (error) {
+      console.error("신고 거부 실패:", error);
+      alert("신고 거부에 실패했습니다.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // 일괄 신고 승인
+  const handleBulkApprove = async () => {
+    if (selectedPosts.size === 0) {
+      alert("승인할 게시글을 선택해주세요.");
+      return;
+    }
+
+    if (!confirm(`선택된 ${selectedPosts.size}개의 신고를 승인하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // TODO: API 호출 - postService.bulkApproveReports(Array.from(selectedPosts))
+      console.log("일괄 승인:", Array.from(selectedPosts));
+
+      // 상태 업데이트
+      setPosts((prev) =>
+        prev.map((post) =>
+          selectedPosts.has(post.keywordId)
+            ? { ...post, status: "APPROVED" }
+            : post
+        )
+      );
+
+      setSelectedPosts(new Set());
+      alert(`${selectedPosts.size}개의 신고가 승인되었습니다.`);
+    } catch (error) {
+      console.error("일괄 승인 실패:", error);
+      alert("일괄 승인에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 일괄 신고 거부
+  const handleBulkReject = async () => {
+    if (selectedPosts.size === 0) {
+      alert("거부할 게시글을 선택해주세요.");
+      return;
+    }
+
+    if (!confirm(`선택된 ${selectedPosts.size}개의 신고를 거부하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // TODO: API 호출 - postService.bulkRejectReports(Array.from(selectedPosts))
+      console.log("일괄 거부:", Array.from(selectedPosts));
+
+      // 상태 업데이트
+      setPosts((prev) =>
+        prev.map((post) =>
+          selectedPosts.has(post.keywordId)
+            ? { ...post, status: "REJECTED" }
+            : post
+        )
+      );
+
+      setSelectedPosts(new Set());
+      alert(`${selectedPosts.size}개의 신고가 거부되었습니다.`);
+    } catch (error) {
+      console.error("일괄 거부 실패:", error);
+      alert("일괄 거부에 실패했습니다.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -186,6 +303,33 @@ export default function PostsManagementPage() {
         </div>
       </div>
 
+      {/* 일괄 처리 버튼 */}
+      {selectedPosts.size > 0 && (
+        <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-200 text-sm">
+              {selectedPosts.size}개 게시글 선택됨
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={handleBulkApprove}
+                disabled={loading}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                일괄 승인
+              </button>
+              <button
+                onClick={handleBulkReject}
+                disabled={loading}
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                일괄 거부
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 테이블 */}
       <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 overflow-hidden">
         <div className="overflow-x-auto">
@@ -201,9 +345,6 @@ export default function PostsManagementPage() {
                     onChange={handleSelectAll}
                     className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
-                  선택
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
                   포스트 제목
@@ -257,9 +398,6 @@ export default function PostsManagementPage() {
                         className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                       />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100">
-                      {/* 선택 열은 체크박스로 대체 */}
-                    </td>
                     <td className="px-4 py-3 text-sm text-gray-100 max-w-xs truncate font-medium">
                       포스트 제목 {post.keywordId}
                     </td>
@@ -284,6 +422,32 @@ export default function PostsManagementPage() {
                       >
                         {getStatusText(post.status)}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {post.status === "PENDING" ? (
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => handleApproveReport(post.keywordId)}
+                            disabled={actionLoading === post.keywordId}
+                            className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {actionLoading === post.keywordId
+                              ? "처리중..."
+                              : "승인"}
+                          </button>
+                          <button
+                            onClick={() => handleRejectReport(post.keywordId)}
+                            disabled={actionLoading === post.keywordId}
+                            className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {actionLoading === post.keywordId
+                              ? "처리중..."
+                              : "거부"}
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 text-xs">처리완료</span>
+                      )}
                     </td>
                   </tr>
                 ))
