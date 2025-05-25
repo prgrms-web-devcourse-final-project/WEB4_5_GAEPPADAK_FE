@@ -117,7 +117,7 @@ export default function ProfileEditPage() {
       await authService.patchProfile(updateData);
 
       alert("프로필이 성공적으로 업데이트되었습니다.");
-      setIsEditing(false);
+      router.push("/main");
     } catch (error) {
       console.error("프로필 업데이트 실패:", error);
       alert("프로필 업데이트에 실패했습니다.");
@@ -143,7 +143,6 @@ export default function ProfileEditPage() {
 
     try {
       // 회원 탈퇴 API 호출
-
       await authService.deleteAccount();
 
       alert("회원 탈퇴가 완료되었습니다.");
