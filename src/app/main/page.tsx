@@ -24,7 +24,6 @@ export default function Home() {
   const [showManagementDropdown, setShowManagementDropdown] = useState(false);
 
   // 사용자 정보 가져오기
-  const { currentUser, isLoggedIn } = useUser();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -162,60 +161,6 @@ export default function Home() {
           </h2>
 
           {/* 관리자인 경우 관리 탭 드롭다운 표시 */}
-          {isLoggedIn && currentUser?.role === "ADMIN" && (
-            <div className="relative management-dropdown">
-              <button
-                onClick={() =>
-                  setShowManagementDropdown(!showManagementDropdown)
-                }
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium cursor-pointer flex items-center gap-2"
-              >
-                관리 목록
-                <svg
-                  className={`w-4 h-4 transition-transform ${showManagementDropdown ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              {/* 드롭다운 메뉴 */}
-              {showManagementDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                  <div className="py-2">
-                    <Link
-                      href="/main/management/posts"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => setShowManagementDropdown(false)}
-                    >
-                      포스트
-                    </Link>
-                    <Link
-                      href="/main/management/comments"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => setShowManagementDropdown(false)}
-                    >
-                      댓글
-                    </Link>
-                    <Link
-                      href="/main/management/members"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => setShowManagementDropdown(false)}
-                    >
-                      회원
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {videos.length > 0 ? (
