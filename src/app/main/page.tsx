@@ -6,6 +6,7 @@ import { newsService } from "@src/services/news.service";
 import { videoService } from "@src/services/video.service";
 import { postService } from "@src/services/post.service";
 import { INews, IVideo, IPost } from "@/types";
+import { useUser } from "@/src/contexts/UserContext";
 
 // UI 컴포넌트 임포트
 import LoadingSpinner from "@src/components/ui/LoadingSpinner";
@@ -20,6 +21,9 @@ export default function Home() {
   const [videos, setVideos] = useState<IVideo.ISummary[]>([]);
   const [posts, setPosts] = useState<IPost.ISummary[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // 사용자 정보 가져오기
+  const { currentUser, isLoggedIn } = useUser();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,6 +141,16 @@ export default function Home() {
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             인기 유튜브
           </h2>
+
+          {/* 관리자인 경우 관리 페이지 링크 표시 */}
+          {isLoggedIn && currentUser?.role === "ADMIN" && (
+            <Link
+              href="/admin"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
+            >
+              관리 페이지
+            </Link>
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {videos.length > 0 ? (
