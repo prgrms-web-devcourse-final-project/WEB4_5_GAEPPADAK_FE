@@ -99,6 +99,18 @@ class AuthService {
       throw e;
     }
   }
+
+  async checkPassword(body: IAuth.CheckPasswordDto): Promise<void> {
+    try {
+      await axiosInstance.post<ApiResponse<void>>(
+        "api/v1/auth/check-password",
+        body
+      );
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 }
 
 export const authService = new AuthService();

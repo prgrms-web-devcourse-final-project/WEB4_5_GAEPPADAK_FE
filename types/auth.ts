@@ -60,4 +60,8 @@ export namespace IAuth {
 
     newPassword!: string;
   }
+
+  export class CheckPasswordDto {
+    password!: string;
+  }
 }
