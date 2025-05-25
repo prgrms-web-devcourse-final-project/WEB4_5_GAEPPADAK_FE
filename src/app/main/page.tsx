@@ -145,7 +145,7 @@ export default function Home() {
           {/* 관리자인 경우 관리 페이지 링크 표시 */}
           {isLoggedIn && currentUser?.role === "ADMIN" && (
             <Link
-              href="/admin"
+              href="/management/posts"
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
             >
               관리 페이지

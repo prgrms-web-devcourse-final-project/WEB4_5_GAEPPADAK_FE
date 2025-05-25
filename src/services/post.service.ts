@@ -59,7 +59,7 @@ class PostService {
     try {
       const response = await axiosInstance.get<
         ApiResponse<IPagination.IOffset<IPost.ISummaryForAdmin[]>>
-      >(`/api/v1/admin/reports/posts`, {
+      >(`/api/v2/admin/reports/posts`, {
         params: query,
       });
       return response.data;

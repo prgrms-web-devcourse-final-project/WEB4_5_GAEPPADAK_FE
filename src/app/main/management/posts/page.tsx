@@ -1,0 +1,350 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { postService } from "@src/services/post.service";
+import { IPost, IPagination } from "@/types";
+
+export default function PostsManagementPage() {
+  const [posts, setPosts] = useState<IPost.ISummaryForAdmin[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPosts, setSelectedPosts] = useState<Set<number>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [query, setQuery] = useState<IPost.GetListQueryDtoForAdmin>({
+    page: 1,
+    size: 10,
+    sort: "reportedAt",
+    searchTarget: "post_title",
+    searchValue: "",
+  });
+
+  // 데이터 로드
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await postService.getReportedPosts(query);
+      setPosts(response.data.list);
+      setTotalPages(Math.ceil(response.data.meta.totalElements / query.size));
+    } catch (error) {
+      console.error("신고된 게시글 조회 실패:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, [query]);
+
+  // 검색 처리
+  const handleSearch = () => {
+    setQuery((prev) => ({ ...prev, page: 1 }));
+    setCurrentPage(1);
+  };
+
+  // 정렬 변경
+  const handleSortChange = (sort: IPost.SortKey) => {
+    setQuery((prev) => ({ ...prev, sort, page: 1 }));
+    setCurrentPage(1);
+  };
+
+  // 검색 대상 변경
+  const handleSearchTargetChange = (searchTarget: IPost.SearchTarget) => {
+    setQuery((prev) => ({ ...prev, searchTarget }));
+  };
+
+  // 검색어 변경
+  const handleSearchValueChange = (searchValue: string) => {
+    setQuery((prev) => ({ ...prev, searchValue }));
+  };
+
+  // 페이지 변경
+  const handlePageChange = (page: number) => {
+    setQuery((prev) => ({ ...prev, page }));
+    setCurrentPage(page);
+  };
+
+  // 체크박스 처리
+  const handleSelectPost = (postId: number) => {
+    const newSelected = new Set(selectedPosts);
+    if (newSelected.has(postId)) {
+      newSelected.delete(postId);
+    } else {
+      newSelected.add(postId);
+    }
+    setSelectedPosts(newSelected);
+  };
+
+  // 전체 선택/해제
+  const handleSelectAll = () => {
+    if (selectedPosts.size === posts.length) {
+      setSelectedPosts(new Set());
+    } else {
+      setSelectedPosts(new Set(posts.map((post) => post.keywordId)));
+    }
+  };
+
+  // 신고 사유 표시
+  const getReportReasonText = (reasons: IPost.ReportReason[]) => {
+    const reasonMap = {
+      [IPost.ReportReason.BAD_CONTENT]: "부적절한 내용",
+      [IPost.ReportReason.FALSE_INFO]: "허위 정보",
+      [IPost.ReportReason.ETC]: "기타",
+    };
+    return reasons.map((reason) => reasonMap[reason]).join(", ");
+  };
+
+  // 상태 표시
+  const getStatusText = (status: string) => {
+    const statusMap: { [key: string]: string } = {
+      PENDING: "대기중",
+      APPROVED: "승인됨",
+      REJECTED: "거부됨",
+    };
+    return statusMap[status] || status;
+  };
+
+  // 상태별 색상
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "text-yellow-600 bg-yellow-100";
+      case "APPROVED":
+        return "text-green-600 bg-green-100";
+      case "REJECTED":
+        return "text-red-600 bg-red-100";
+      default:
+        return "text-gray-600 bg-gray-100";
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">게시글 관리</h1>
+
+      {/* 검색 및 필터 영역 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div className="flex flex-wrap gap-4 items-end">
+          {/* 검색 대상 선택 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              검색 대상
+            </label>
+            <select
+              value={query.searchTarget}
+              onChange={(e) =>
+                handleSearchTargetChange(e.target.value as IPost.SearchTarget)
+              }
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="post_title">포스트 제목</option>
+              <option value="post_summary">포스트 내용</option>
+              <option value="keyword">키워드</option>
+              <option value="report_reason">신고 사유</option>
+            </select>
+          </div>
+
+          {/* 검색어 입력 */}
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              검색어
+            </label>
+            <div className="flex">
+              <input
+                type="text"
+                value={query.searchValue || ""}
+                onChange={(e) => handleSearchValueChange(e.target.value)}
+                placeholder="검색어를 입력하세요"
+                className="flex-1 border border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              />
+              <button
+                onClick={handleSearch}
+                className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
+              >
+                검색
+              </button>
+            </div>
+          </div>
+
+          {/* 정렬 선택 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              정렬
+            </label>
+            <select
+              value={query.sort}
+              onChange={(e) =>
+                handleSortChange(e.target.value as IPost.SortKey)
+              }
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="reportedAt">최근 신고 날짜</option>
+              <option value="reportCount">신고 횟수</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* 테이블 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="w-12 px-4 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={
+                      posts.length > 0 && selectedPosts.size === posts.length
+                    }
+                    onChange={handleSelectAll}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  선택
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  포스트 제목
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  포스트 내용
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  키워드
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  신고 사유
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  최근 신고 날짜
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  신고 횟수
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  상태
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan={9} className="px-4 py-8 text-center">
+                    <div className="flex justify-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    </div>
+                  </td>
+                </tr>
+              ) : posts.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
+                    신고된 게시글이 없습니다.
+                  </td>
+                </tr>
+              ) : (
+                posts.map((post) => (
+                  <tr key={post.keywordId} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedPosts.has(post.keywordId)}
+                        onChange={() => handleSelectPost(post.keywordId)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {/* 선택 열은 체크박스로 대체 */}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900 max-w-xs truncate">
+                      포스트 제목 {post.keywordId}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
+                      포스트에 대한 내용. 길을 넘어가면 ...처리
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      키워드명
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {getReportReasonText(post.reportReason)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {new Date(post.reportAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {post.reportCount}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(post.status)}`}
+                      >
+                        {getStatusText(post.status)}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6">
+          <nav className="flex items-center space-x-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-2 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const pageNum =
+                Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => handlePageChange(pageNum)}
+                  className={`px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${
+                    currentPage === pageNum
+                      ? "bg-blue-600 text-white"
+                      : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </nav>
+        </div>
+      )}
+    </div>
+  );
+}
