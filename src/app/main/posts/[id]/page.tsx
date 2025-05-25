@@ -33,7 +33,8 @@ export default function PostDetailPage() {
   const [editingComment, setEditingComment] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
   const [reportingComment, setReportingComment] = useState<number | null>(null);
-  const [reportReason, setReportReason] = useState("");
+  const [reportReason, setReportReason] =
+    useState<IComment.ReportReason | null>(null);
 
   // Context에서 사용자 정보 가져오기
   const { currentUser, isLoggedIn } = useUser();
@@ -46,18 +47,18 @@ export default function PostDetailPage() {
   // 댓글 신고 모달 열기
   const openReportModal = (commentId: number) => {
     setReportingComment(commentId);
-    setReportReason("");
+    setReportReason(null);
   };
 
   // 댓글 신고 모달 닫기
   const closeReportModal = () => {
     setReportingComment(null);
-    setReportReason("");
+    setReportReason(null);
   };
 
   // 댓글 신고 처리
   const handleReportComment = async () => {
-    if (!reportingComment || !reportReason.trim()) {
+    if (!reportingComment || !reportReason) {
       alert("신고 사유를 선택해주세요.");
       return;
     }
@@ -818,9 +819,11 @@ export default function PostDetailPage() {
                 <input
                   type="radio"
                   name="reportReason"
-                  value="부적절한 내용을 담고 있습니다"
-                  checked={reportReason === "부적절한 내용을 담고 있습니다"}
-                  onChange={(e) => setReportReason(e.target.value)}
+                  value={IComment.ReportReason.BAD_CONTENT}
+                  checked={reportReason === IComment.ReportReason.BAD_CONTENT}
+                  onChange={(e) =>
+                    setReportReason(e.target.value as IComment.ReportReason)
+                  }
                   className="mr-3 cursor-pointer"
                 />
                 <span className="text-gray-700 dark:text-gray-300">
@@ -832,9 +835,11 @@ export default function PostDetailPage() {
                 <input
                   type="radio"
                   name="reportReason"
-                  value="불쾌한 표현이 있습니다"
-                  checked={reportReason === "불쾌한 표현이 있습니다"}
-                  onChange={(e) => setReportReason(e.target.value)}
+                  value={IComment.ReportReason.RUDE_LANGUAGE}
+                  checked={reportReason === IComment.ReportReason.RUDE_LANGUAGE}
+                  onChange={(e) =>
+                    setReportReason(e.target.value as IComment.ReportReason)
+                  }
                   className="mr-3 cursor-pointer"
                 />
                 <span className="text-gray-700 dark:text-gray-300">
@@ -846,9 +851,11 @@ export default function PostDetailPage() {
                 <input
                   type="radio"
                   name="reportReason"
-                  value="광고성 게시글입니다"
-                  checked={reportReason === "광고성 게시글입니다"}
-                  onChange={(e) => setReportReason(e.target.value)}
+                  value={IComment.ReportReason.SPAM}
+                  checked={reportReason === IComment.ReportReason.SPAM}
+                  onChange={(e) =>
+                    setReportReason(e.target.value as IComment.ReportReason)
+                  }
                   className="mr-3 cursor-pointer"
                 />
                 <span className="text-gray-700 dark:text-gray-300">
@@ -860,9 +867,11 @@ export default function PostDetailPage() {
                 <input
                   type="radio"
                   name="reportReason"
-                  value="기타"
-                  checked={reportReason === "기타"}
-                  onChange={(e) => setReportReason(e.target.value)}
+                  value={IComment.ReportReason.ETC}
+                  checked={reportReason === IComment.ReportReason.ETC}
+                  onChange={(e) =>
+                    setReportReason(e.target.value as IComment.ReportReason)
+                  }
                   className="mr-3 cursor-pointer"
                 />
                 <span className="text-gray-700 dark:text-gray-300">기타</span>

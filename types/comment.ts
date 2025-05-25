@@ -17,6 +17,14 @@ export interface IComment {
 }
 
 export namespace IComment {
+  export enum ReportReason {
+    BAD_CONTENT = "BAD_CONTENT",
+    RUDE_LANGUAGE = "RUDE_LANGUAGE",
+    SPAM = "SPAM",
+    FALSE_INFO = "FALSE_INFO",
+    ETC = "ETC",
+  }
+
   export interface ILike {
     id: number;
 
@@ -46,6 +54,6 @@ export namespace IComment {
   }
 
   export class ReportDto {
-    reason!: string;
+    reason!: ReportReason;
   }
 }

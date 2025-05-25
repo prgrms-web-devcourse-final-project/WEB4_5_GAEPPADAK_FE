@@ -80,7 +80,7 @@ export class CommentService {
 
   async reportComment(
     commentId: number,
-    reason: string
+    reason: IComment.ReportReason
   ): Promise<ApiResponse<void>> {
     try {
       const response = await axiosInstance.post<
