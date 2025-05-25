@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/src/contexts/UserContext";
 import LoadingSpinner from "@src/components/ui/LoadingSpinner";
 import Image from "next/image";
+import { authService } from "@src/services/auth.service";
 
 export default function ProfileEditPage() {
   const { currentUser, isLoggedIn } = useUser();
@@ -102,8 +103,17 @@ export default function ProfileEditPage() {
 
     setLoading(true);
     try {
-      // TODO: API 호출로 프로필 업데이트
-      console.log("프로필 업데이트:", formData);
+      // 프로필 업데이트 API 호출
+      const updateData: { nickname: string; password?: string } = {
+        nickname: formData.nickname,
+      };
+
+      // 비밀번호가 입력된 경우에만 포함
+      if (formData.newPassword.trim()) {
+        updateData.password = formData.newPassword;
+      }
+
+      await authService.patchProfile(updateData);
 
       alert("프로필이 성공적으로 업데이트되었습니다.");
       setIsEditing(false);
