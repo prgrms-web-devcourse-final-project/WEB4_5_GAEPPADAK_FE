@@ -14,6 +14,7 @@ import { videoService } from "@/src/services/video.service";
 import { useUser } from "@/src/contexts/UserContext";
 import NewsCard from "@src/components/cards/NewsCard";
 import VideoCard from "@src/components/cards/VideoCard";
+import { AxiosError } from "axios";
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -156,7 +157,14 @@ export default function PostDetailPage() {
       setTotalPages(meta.totalPages);
     } catch (error) {
       console.error("Error creating comment:", error);
-      alert("댓글 작성에 실패했습니다. 로그인해주세요.");
+
+      // 401 에러(로그인 관련)는 axios 인터셉터가 처리하므로 여기서는 다른 에러만 처리
+      if (error instanceof AxiosError && error.response?.status !== 401) {
+        alert("댓글 작성에 실패했습니다.");
+      } else if (!(error instanceof AxiosError)) {
+        // AxiosError가 아닌 다른 에러의 경우에도 알림 표시
+        alert("댓글 작성에 실패했습니다.");
+      }
     }
   };
 
@@ -254,7 +262,14 @@ export default function PostDetailPage() {
       setTotalPages(meta.totalPages);
     } catch (error) {
       console.error("Error toggling comment like:", error);
-      alert("좋아요 처리에 실패했습니다.");
+
+      // 401 에러(로그인 관련)는 axios 인터셉터가 처리하므로 여기서는 다른 에러만 처리
+      if (error instanceof AxiosError && error.response?.status !== 401) {
+        alert("좋아요 처리에 실패했습니다.");
+      } else if (!(error instanceof AxiosError)) {
+        // AxiosError가 아닌 다른 에러의 경우에도 알림 표시
+        alert("좋아요 처리에 실패했습니다.");
+      }
     }
   };
 
@@ -462,17 +477,27 @@ export default function PostDetailPage() {
           {/* 댓글 입력 폼 */}
           <form onSubmit={handleCommentSubmit} className="mb-8">
             <div className="relative">
-              <input
-                type="text"
+              <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 maxLength={150}
                 placeholder="댓글 입력 창"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={1}
+                className="w-full px-4 py-3 pr-16 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none overflow-hidden"
+                style={{
+                  minHeight: "48px",
+                  height: "auto",
+                }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = "auto";
+                  target.style.height =
+                    Math.min(target.scrollHeight, 120) + "px";
+                }}
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors cursor-pointer"
+                className="absolute right-2 bottom-2 px-4 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors cursor-pointer"
               >
                 입력
               </button>
@@ -611,16 +636,16 @@ export default function PostDetailPage() {
                             e.preventDefault();
                             handleLikeComment(
                               comment.commentId,
-                              comment.isLiked
+                              comment.likedByMe
                             );
                           }}
                           className={`text-sm flex items-center gap-1 transition-colors cursor-pointer ${
-                            comment.isLiked
+                            comment.likedByMe
                               ? "text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
                               : "text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
                           }`}
                         >
-                          {comment.isLiked ? "❤️" : "🤍"} {comment.likeCount}
+                          {comment.likedByMe ? "❤️" : "🤍"} {comment.likeCount}
                         </button>
                       )}
 

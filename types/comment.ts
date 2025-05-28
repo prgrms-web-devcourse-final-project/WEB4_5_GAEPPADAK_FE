@@ -13,7 +13,9 @@ export interface IComment {
 
   profileUrl: string;
 
-  isLiked: boolean;
+  likedByMe: boolean;
+
+  reportedByMe: boolean;
 }
 
 export namespace IComment {
@@ -68,6 +70,8 @@ export namespace IComment {
 
   export class ReportDto {
     reason!: ReportReason;
+
+    etcReason?: string;
   }
 
   export type SearchTarget =
