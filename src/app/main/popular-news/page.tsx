@@ -238,56 +238,61 @@ export default function PopularNewsPage() {
       <div className="space-y-5">
         {newsList.length > 0 ? (
           newsList.map((news, index) => (
-            <div
+            <Link
               key={news.sourceId || index}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md border border-gray-100 dark:border-gray-700"
+              href={news.url || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block group"
             >
-              <div className="flex flex-col md:flex-row">
-                {/* 썸네일 */}
-                <div className="md:w-32 md:h-32 h-48 relative bg-gray-100 dark:bg-gray-700 flex-shrink-0">
-                  {news.thumbnailUrl ? (
-                    <Image
-                      src={news.thumbnailUrl}
-                      alt={news.title || ""}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-12 h-12"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md border border-gray-100 dark:border-gray-700 group-hover:scale-[1.02]">
+                <div className="flex flex-col md:flex-row">
+                  {/* 썸네일 */}
+                  <div className="md:w-32 md:h-32 h-48 relative bg-gray-100 dark:bg-gray-700 flex-shrink-0">
+                    {news.thumbnailUrl ? (
+                      <Image
+                        src={news.thumbnailUrl}
+                        alt={news.title || ""}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-12 h-12"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
 
-                {/* 내용 */}
-                <div className="flex-1 p-5">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                    {news.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                    {news.description}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {news.publishedAt ? formatDate(news.publishedAt) : ""}
-                    </span>
+                  {/* 내용 */}
+                  <div className="flex-1 p-5">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {news.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                      {news.description}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {news.publishedAt ? formatDate(news.publishedAt) : ""}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))
         ) : (
           // 뉴스가 없는 경우 메시지 표시
@@ -326,7 +331,7 @@ export default function PopularNewsPage() {
             연관 유튜브
           </h2>
           <Link
-            href="/videos"
+            href="/main/popular-videos"
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
           >
             더보기

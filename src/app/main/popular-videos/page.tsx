@@ -287,7 +287,7 @@ export default function PopularVideosPage() {
             연관 뉴스
           </h2>
           <Link
-            href="/news"
+            href="/main/popular-news"
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
           >
             더보기
