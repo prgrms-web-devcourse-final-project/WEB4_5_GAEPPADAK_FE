@@ -68,6 +68,37 @@ class PostService {
       throw error;
     }
   }
+
+  async approveReport(postIds: number[]) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<void>>(
+        `/api/v2/admin/reports/posts`,
+        {
+          postIds,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async rejectReport(postIds: number[]) {
+    try {
+      const response = await axiosInstance.request<ApiResponse<void>>({
+        method: "DELETE",
+        url: `/api/v2/admin/reports/posts`,
+        data: {
+          postIds,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export const postService = new PostService();

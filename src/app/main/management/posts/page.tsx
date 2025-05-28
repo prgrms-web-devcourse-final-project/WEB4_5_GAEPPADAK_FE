@@ -81,7 +81,7 @@ export default function PostsManagementPage() {
     if (selectedPosts.size === posts.length) {
       setSelectedPosts(new Set());
     } else {
-      setSelectedPosts(new Set(posts.map((post) => post.keywordId)));
+      setSelectedPosts(new Set(posts.map((post) => post.postId)));
     }
   };
 
@@ -144,16 +144,11 @@ export default function PostsManagementPage() {
 
     try {
       setLoading(true);
-      // TODO: API 호출 - postService.bulkApproveReports(Array.from(selectedPosts))
-      console.log("일괄 승인:", Array.from(selectedPosts));
+      await postService.approveReport(Array.from(selectedPosts));
 
-      // 상태 업데이트
+      // 처리된 항목을 화면에서 제거
       setPosts((prev) =>
-        prev.map((post) =>
-          selectedPosts.has(post.keywordId)
-            ? { ...post, status: "APPROVED" }
-            : post
-        )
+        prev.filter((post) => !selectedPosts.has(post.postId))
       );
 
       setSelectedPosts(new Set());
@@ -179,16 +174,11 @@ export default function PostsManagementPage() {
 
     try {
       setLoading(true);
-      // TODO: API 호출 - postService.bulkRejectReports(Array.from(selectedPosts))
-      console.log("일괄 거부:", Array.from(selectedPosts));
+      await postService.rejectReport(Array.from(selectedPosts));
 
-      // 상태 업데이트
+      // 처리된 항목을 화면에서 제거
       setPosts((prev) =>
-        prev.map((post) =>
-          selectedPosts.has(post.keywordId)
-            ? { ...post, status: "REJECTED" }
-            : post
-        )
+        prev.filter((post) => !selectedPosts.has(post.postId))
       );
 
       setSelectedPosts(new Set());
@@ -389,12 +379,12 @@ export default function PostsManagementPage() {
                 </tr>
               ) : (
                 posts.map((post) => (
-                  <tr key={post.keywordId} className="hover:bg-gray-600">
+                  <tr key={post.postId} className="hover:bg-gray-600">
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
-                        checked={selectedPosts.has(post.keywordId)}
-                        onChange={() => handleSelectPost(post.keywordId)}
+                        checked={selectedPosts.has(post.postId)}
+                        onChange={() => handleSelectPost(post.postId)}
                         className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                       />
                     </td>
