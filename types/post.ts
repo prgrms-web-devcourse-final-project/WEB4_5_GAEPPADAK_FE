@@ -13,6 +13,7 @@ export namespace IPost {
     title: string;
     summary: string;
     thumbnailUrl: string;
+    reportedByMe: boolean;
   }
 
   export interface ISummary extends IBase {
@@ -22,15 +23,15 @@ export namespace IPost {
   }
 
   export interface ISummaryForAdmin {
+    keyword: string;
     keywordId: number;
-
-    reportReason: ReportReason[];
-
-    reportAt: string;
-
+    postId: number;
     reportCount: number;
-
+    reportReason: ReportReason[];
+    reportedAt: string;
     status: string;
+    summary: string;
+    title: string;
   }
 
   export class GetListQueryDto {
@@ -41,6 +42,12 @@ export namespace IPost {
     size: number = 10;
 
     sort: "createdAt" | "viewCount" = "createdAt";
+  }
+
+  export class ReportDto {
+    reason!: ReportReason;
+
+    etcReason?: string;
   }
 
   export type SortKey = "reportedAt" | "reportCount";

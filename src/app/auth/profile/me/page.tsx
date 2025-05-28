@@ -6,9 +6,10 @@ import { useUser } from "@/src/contexts/UserContext";
 import LoadingSpinner from "@src/components/ui/LoadingSpinner";
 import Image from "next/image";
 import { authService } from "@src/services/auth.service";
+import { AxiosError } from "axios";
 
 export default function ProfileEditPage() {
-  const { currentUser, isLoggedIn } = useUser();
+  const { currentUser, isLoggedIn, logout, loading: userLoading } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -29,6 +30,11 @@ export default function ProfileEditPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
+    // UserContext 로딩 중이면 대기
+    if (userLoading) {
+      return;
+    }
+
     // 로그인 상태 확인
     if (!isLoggedIn) {
       router.push("/auth/signin");
@@ -50,7 +56,7 @@ export default function ProfileEditPage() {
     }
 
     setLoading(false);
-  }, [isLoggedIn, router, currentUser]);
+  }, [userLoading, isLoggedIn, router, currentUser]);
 
   // 입력 값 변경 처리
   const handleInputChange = (field: string, value: string) => {
@@ -191,13 +197,23 @@ export default function ProfileEditPage() {
     setLoading(true);
     try {
       // 프로필 업데이트 API 호출
-      const updateData: { nickname: string; password?: string } = {
-        nickname: formData.nickname,
-      };
+      const updateData: { nickname?: string; password?: string } = {};
+
+      // 닉네임이 변경된 경우에만 포함
+      if (formData.nickname !== currentUser?.nickname) {
+        updateData.nickname = formData.nickname;
+      }
 
       // 비밀번호가 입력된 경우에만 포함
       if (formData.newPassword.trim()) {
         updateData.password = formData.newPassword;
+      }
+
+      // 변경사항이 없으면 요청하지 않음
+      if (Object.keys(updateData).length === 0) {
+        alert("변경된 정보가 없습니다.");
+        setLoading(false);
+        return;
       }
 
       await authService.patchProfile(updateData);
@@ -206,7 +222,16 @@ export default function ProfileEditPage() {
       router.push("/main");
     } catch (error) {
       console.error("프로필 업데이트 실패:", error);
-      alert("프로필 업데이트에 실패했습니다.");
+
+      // API 응답에서 에러 메시지 추출
+      let errorMessage = "프로필 업데이트에 실패했습니다.";
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -231,17 +256,29 @@ export default function ProfileEditPage() {
       // 회원 탈퇴 API 호출
       await authService.deleteAccount();
 
+      // 회원탈퇴 성공 후 UserContext 상태 업데이트
+      logout();
+
       alert("회원 탈퇴가 완료되었습니다.");
       router.push("/main");
     } catch (error) {
       console.error("회원 탈퇴 실패:", error);
-      alert("회원 탈퇴에 실패했습니다.");
+
+      // API 응답에서 에러 메시지 추출
+      let errorMessage = "회원 탈퇴에 실패했습니다.";
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
+  if (userLoading || loading) {
     return <LoadingSpinner />;
   }
 
@@ -275,7 +312,7 @@ export default function ProfileEditPage() {
             onClick={() => setIsEditing(!isEditing)}
             className="px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors cursor-pointer"
           >
-            정보 수정
+            {isEditing ? "수정 취소" : "정보 수정"}
           </button>
         </div>
 

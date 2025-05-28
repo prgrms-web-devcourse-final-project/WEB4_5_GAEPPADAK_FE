@@ -17,6 +17,24 @@ export namespace INews {
     summary: string;
   }
 
+  export interface ISummaryTop {
+    sourceId: string;
+
+    url: string;
+
+    title: string;
+
+    description: string;
+
+    thumbnailUrl: string;
+
+    publishedAt: string;
+
+    platform: string;
+
+    score: number;
+  }
+
   export namespace ISource {
     export interface ISummary {
       sourceId: number;

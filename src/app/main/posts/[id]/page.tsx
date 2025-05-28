@@ -14,6 +14,7 @@ import { videoService } from "@/src/services/video.service";
 import { useUser } from "@/src/contexts/UserContext";
 import NewsCard from "@src/components/cards/NewsCard";
 import VideoCard from "@src/components/cards/VideoCard";
+import { AxiosError } from "axios";
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -37,6 +38,7 @@ export default function PostDetailPage() {
   const [reportReason, setReportReason] = useState<
     IComment.ReportReason | IPost.ReportReason | null
   >(null);
+  const [etcReason, setEtcReason] = useState<string>("");
 
   // Context에서 사용자 정보 가져오기
   const { currentUser, isLoggedIn } = useUser();
@@ -50,12 +52,14 @@ export default function PostDetailPage() {
   const openReportModal = (commentId: number) => {
     setReportingComment(commentId);
     setReportReason(null);
+    setEtcReason("");
   };
 
   // 포스트 신고 모달 열기
   const openPostReportModal = () => {
     setReportingPost(true);
     setReportReason(null);
+    setEtcReason("");
   };
 
   // 댓글 신고 모달 닫기
@@ -63,6 +67,7 @@ export default function PostDetailPage() {
     setReportingComment(null);
     setReportingPost(false);
     setReportReason(null);
+    setEtcReason("");
   };
 
   // 댓글 신고 처리
@@ -72,10 +77,34 @@ export default function PostDetailPage() {
       return;
     }
 
+    // 기타 사유가 선택되었는데 사유를 입력하지 않은 경우
+    if (reportReason === IComment.ReportReason.ETC && !etcReason.trim()) {
+      alert("기타 사유를 입력해주세요.");
+      return;
+    }
+
     try {
-      await commentService.reportComment(reportingComment, reportReason);
+      const reportDto: IComment.ReportDto = {
+        reason: reportReason as IComment.ReportReason,
+        ...(reportReason === IComment.ReportReason.ETC &&
+          etcReason.trim() && {
+            etcReason: etcReason,
+          }),
+      };
+
+      await commentService.reportComment(reportingComment, reportDto);
       alert("신고가 접수되었습니다.");
       closeReportModal();
+
+      // 댓글 목록 새로고침하여 reportedByMe 상태 업데이트
+      const { list, meta } = await commentService.getComments(postId, {
+        page: currentPage - 1,
+        size: 10,
+        sort: "createdAt,DESC",
+      });
+      setComments(list);
+      setCommentCount(meta.totalElements);
+      setTotalPages(meta.totalPages);
     } catch (error) {
       console.error("Error reporting comment:", error);
       alert("신고 처리에 실패했습니다.");
@@ -89,10 +118,28 @@ export default function PostDetailPage() {
       return;
     }
 
+    // 기타 사유가 선택되었는데 사유를 입력하지 않은 경우
+    if (reportReason === IPost.ReportReason.ETC && !etcReason.trim()) {
+      alert("기타 사유를 입력해주세요.");
+      return;
+    }
+
     try {
-      await postService.reportPost(postId, reportReason as IPost.ReportReason);
+      const reportDto: IPost.ReportDto = {
+        reason: reportReason as IPost.ReportReason,
+        ...(reportReason === IPost.ReportReason.ETC &&
+          etcReason.trim() && {
+            etcReason: etcReason,
+          }),
+      };
+
+      await postService.reportPost(postId, reportDto);
       alert("신고가 접수되었습니다.");
       closeReportModal();
+
+      // 포스트 정보 새로고침하여 reportedByMe 상태 업데이트
+      const response = await postService.getDetail(postId);
+      setPost(response.data);
     } catch (error) {
       console.error("Error reporting post:", error);
       alert("신고 처리에 실패했습니다.");
@@ -156,7 +203,14 @@ export default function PostDetailPage() {
       setTotalPages(meta.totalPages);
     } catch (error) {
       console.error("Error creating comment:", error);
-      alert("댓글 작성에 실패했습니다. 로그인해주세요.");
+
+      // 401 에러(로그인 관련)는 axios 인터셉터가 처리하므로 여기서는 다른 에러만 처리
+      if (error instanceof AxiosError && error.response?.status !== 401) {
+        alert("댓글 작성에 실패했습니다.");
+      } else if (!(error instanceof AxiosError)) {
+        // AxiosError가 아닌 다른 에러의 경우에도 알림 표시
+        alert("댓글 작성에 실패했습니다.");
+      }
     }
   };
 
@@ -254,7 +308,14 @@ export default function PostDetailPage() {
       setTotalPages(meta.totalPages);
     } catch (error) {
       console.error("Error toggling comment like:", error);
-      alert("좋아요 처리에 실패했습니다.");
+
+      // 401 에러(로그인 관련)는 axios 인터셉터가 처리하므로 여기서는 다른 에러만 처리
+      if (error instanceof AxiosError && error.response?.status !== 401) {
+        alert("좋아요 처리에 실패했습니다.");
+      } else if (!(error instanceof AxiosError)) {
+        // AxiosError가 아닌 다른 에러의 경우에도 알림 표시
+        alert("좋아요 처리에 실패했습니다.");
+      }
     }
   };
 
@@ -262,7 +323,13 @@ export default function PostDetailPage() {
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return date.toISOString().split("T")[0]; // YYYY-MM-DD 형식
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
     } catch (error) {
       return dateString; // 파싱 실패시 원본 반환
     }
@@ -410,7 +477,7 @@ export default function PostDetailPage() {
               </span>
 
               {/* 포스트 신고 버튼 */}
-              {isLoggedIn && (
+              {isLoggedIn && !post.reportedByMe && (
                 <button
                   onClick={openPostReportModal}
                   className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors cursor-pointer"
@@ -427,28 +494,16 @@ export default function PostDetailPage() {
 
           {/* 썸네일 이미지 */}
           <div className="px-6 py-8">
-            <div className="w-full aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden relative mb-6">
-              {post.thumbnailUrl ? (
+            {post.thumbnailUrl ?? (
+              <div className="w-full aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden relative mb-6">
                 <Image
                   src={post.thumbnailUrl}
                   alt={post.title}
                   fill
                   className="object-cover"
                 />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-32">
-                    <Image
-                      src="/sample-image.png"
-                      alt="Sample"
-                      width={150}
-                      height={100}
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* 포스트 내용 */}
             <div className="prose dark:prose-invert max-w-none">
@@ -468,17 +523,27 @@ export default function PostDetailPage() {
           {/* 댓글 입력 폼 */}
           <form onSubmit={handleCommentSubmit} className="mb-8">
             <div className="relative">
-              <input
-                type="text"
+              <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 maxLength={150}
                 placeholder="댓글 입력 창"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={1}
+                className="w-full px-4 py-3 pr-16 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none overflow-hidden"
+                style={{
+                  minHeight: "48px",
+                  height: "auto",
+                }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = "auto";
+                  target.style.height =
+                    Math.min(target.scrollHeight, 120) + "px";
+                }}
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors cursor-pointer"
+                className="absolute right-2 bottom-2 px-4 py-1.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors cursor-pointer"
               >
                 입력
               </button>
@@ -617,16 +682,16 @@ export default function PostDetailPage() {
                             e.preventDefault();
                             handleLikeComment(
                               comment.commentId,
-                              comment.isLiked
+                              comment.likedByMe
                             );
                           }}
                           className={`text-sm flex items-center gap-1 transition-colors cursor-pointer ${
-                            comment.isLiked
+                            comment.likedByMe
                               ? "text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300"
                               : "text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
                           }`}
                         >
-                          {comment.isLiked ? "❤️" : "🤍"} {comment.likeCount}
+                          {comment.likedByMe ? "❤️" : "🤍"} {comment.likeCount}
                         </button>
                       )}
 
@@ -664,6 +729,7 @@ export default function PostDetailPage() {
                       {/* 남의 댓글인 경우에만 신고 버튼 표시 */}
                       {isLoggedIn &&
                         !isMyComment(comment.nickname) &&
+                        !comment.reportedByMe &&
                         editingComment !== comment.commentId && (
                           <button
                             onClick={() => openReportModal(comment.commentId)}
@@ -967,6 +1033,26 @@ export default function PostDetailPage() {
                 />
                 <span className="text-gray-700 dark:text-gray-300">기타</span>
               </label>
+
+              {/* 기타 사유 입력란 */}
+              {reportReason ===
+                (reportingPost
+                  ? IPost.ReportReason.ETC
+                  : IComment.ReportReason.ETC) && (
+                <div className="ml-6 mt-2">
+                  <textarea
+                    value={etcReason}
+                    onChange={(e) => setEtcReason(e.target.value)}
+                    placeholder="기타 사유를 입력해주세요"
+                    maxLength={200}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  />
+                  <div className="text-right text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {etcReason.length}/200
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 justify-end">

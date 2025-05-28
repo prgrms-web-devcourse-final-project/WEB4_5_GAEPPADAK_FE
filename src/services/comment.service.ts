@@ -80,14 +80,14 @@ export class CommentService {
 
   async reportComment(
     commentId: number,
-    reason: IComment.ReportReason
+    reportDto: IComment.ReportDto
   ): Promise<ApiResponse<void>> {
     try {
       const response = await axiosInstance.post<
         ApiResponse<void>,
         AxiosResponse<ApiResponse<void>>,
         IComment.ReportDto
-      >(`/api/v2/reports/comments/${commentId}`, { reason });
+      >(`/api/v2/reports/comments/${commentId}`, reportDto);
       return response.data;
     } catch (error) {
       console.error(error);
@@ -101,6 +101,35 @@ export class CommentService {
         ApiResponse<IPagination.IOffset<IComment.ISummaryForAdmin[]>>
       >(`/api/v2/admin/reports/comments`, { params: query });
       return response.data.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async approveReport(commentIds: number[]) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<void>>(
+        `/api/v2/admin/reports/comments`,
+        { commentIds }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async rejectReport(commentIds: number[]) {
+    try {
+      const response = await axiosInstance.request<ApiResponse<void>>({
+        method: "DELETE",
+        url: `/api/v2/admin/reports/comments`,
+        data: {
+          commentIds,
+        },
+      });
+      return response.data;
     } catch (error) {
       console.error(error);
       throw error;

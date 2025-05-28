@@ -13,9 +13,8 @@ export default function CommentsManagementPage() {
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [query, setQuery] = useState<IComment.GetListQueryDtoForAdmin>({
-    page: 1,
+    page: currentPage - 1,
     size: 10,
     sort: "reportedAt",
     searchTarget: "post_title",
@@ -90,56 +89,6 @@ export default function CommentsManagementPage() {
     }
   };
 
-  // 개별 신고 승인
-  const handleApproveReport = async (commentId: number) => {
-    try {
-      setActionLoading(commentId);
-      // TODO: API 호출 - commentService.approveReport(commentId)
-      console.log("댓글 신고 승인:", commentId);
-
-      // 상태 업데이트
-      setComments((prev) =>
-        prev.map((comment) =>
-          comment.commentId === commentId
-            ? { ...comment, status: "APPROVED" as string }
-            : comment
-        )
-      );
-
-      alert("댓글 신고가 승인되었습니다.");
-    } catch (error) {
-      console.error("댓글 신고 승인 실패:", error);
-      alert("댓글 신고 승인에 실패했습니다.");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  // 개별 신고 거부
-  const handleRejectReport = async (commentId: number) => {
-    try {
-      setActionLoading(commentId);
-      // TODO: API 호출 - commentService.rejectReport(commentId)
-      console.log("댓글 신고 거부:", commentId);
-
-      // 상태 업데이트
-      setComments((prev) =>
-        prev.map((comment) =>
-          comment.commentId === commentId
-            ? { ...comment, status: "REJECTED" as string }
-            : comment
-        )
-      );
-
-      alert("댓글 신고가 거부되었습니다.");
-    } catch (error) {
-      console.error("댓글 신고 거부 실패:", error);
-      alert("댓글 신고 거부에 실패했습니다.");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
   // 일괄 신고 승인
   const handleBulkApprove = async () => {
     if (selectedComments.size === 0) {
@@ -157,16 +106,11 @@ export default function CommentsManagementPage() {
 
     try {
       setLoading(true);
-      // TODO: API 호출 - commentService.bulkApproveReports(Array.from(selectedComments))
-      console.log("댓글 일괄 승인:", Array.from(selectedComments));
+      await commentService.approveReport(Array.from(selectedComments));
 
-      // 상태 업데이트
+      // 처리된 항목을 화면에서 제거
       setComments((prev) =>
-        prev.map((comment) =>
-          selectedComments.has(comment.commentId)
-            ? { ...comment, status: "APPROVED" as string }
-            : comment
-        )
+        prev.filter((comment) => !selectedComments.has(comment.commentId))
       );
 
       setSelectedComments(new Set());
@@ -196,14 +140,13 @@ export default function CommentsManagementPage() {
 
     try {
       setLoading(true);
-      // TODO: API 호출 - commentService.bulkRejectReports(Array.from(selectedComments))
-      console.log("댓글 일괄 거부:", Array.from(selectedComments));
+      await commentService.rejectReport(Array.from(selectedComments));
 
-      // 상태 업데이트
+      // 상태를 거부됨으로 변경
       setComments((prev) =>
         prev.map((comment) =>
           selectedComments.has(comment.commentId)
-            ? { ...comment, status: "REJECTED" as string }
+            ? { ...comment, status: "REJECTED" }
             : comment
         )
       );
@@ -394,7 +337,7 @@ export default function CommentsManagementPage() {
             <tbody className="divide-y divide-gray-600">
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center">
+                  <td colSpan={8} className="px-4 py-8 text-center">
                     <div className="flex justify-center">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                     </div>
@@ -403,7 +346,7 @@ export default function CommentsManagementPage() {
               ) : comments.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={9}
+                    colSpan={8}
                     className="px-4 py-8 text-center text-gray-300"
                   >
                     신고된 댓글이 없습니다.
@@ -427,13 +370,13 @@ export default function CommentsManagementPage() {
                       {comment.body}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 max-w-xs truncate font-medium">
-                      포스트 제목 {comment.commentId}
+                      {comment.title}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      부적절한 내용
+                      {getReportReasonText(comment.reportReason)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      {new Date().toLocaleDateString()}
+                      {new Date(comment.reportedAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
                       {comment.reportCount}
@@ -444,36 +387,6 @@ export default function CommentsManagementPage() {
                       >
                         {getStatusText(comment.status)}
                       </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {comment.status === "PENDING" ? (
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() =>
-                              handleApproveReport(comment.commentId)
-                            }
-                            disabled={actionLoading === comment.commentId}
-                            className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {actionLoading === comment.commentId
-                              ? "처리중..."
-                              : "승인"}
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleRejectReport(comment.commentId)
-                            }
-                            disabled={actionLoading === comment.commentId}
-                            className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {actionLoading === comment.commentId
-                              ? "처리중..."
-                              : "거부"}
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-xs">처리완료</span>
-                      )}
                     </td>
                   </tr>
                 ))

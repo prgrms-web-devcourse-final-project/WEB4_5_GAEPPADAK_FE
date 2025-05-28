@@ -42,11 +42,11 @@ class PostService {
     }
   }
 
-  async reportPost(postId: number, reason: IPost.ReportReason) {
+  async reportPost(postId: number, reportDto: IPost.ReportDto) {
     try {
       const response = await axiosInstance.post<ApiResponse<void>>(
         `/api/v2/reports/posts/${postId}`,
-        { reason }
+        reportDto
       );
       return response.data;
     } catch (error) {
@@ -61,6 +61,37 @@ class PostService {
         ApiResponse<IPagination.IOffset<IPost.ISummaryForAdmin[]>>
       >(`/api/v2/admin/reports/posts`, {
         params: query,
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async approveReport(postIds: number[]) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<void>>(
+        `/api/v2/admin/reports/posts`,
+        {
+          postIds,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async rejectReport(postIds: number[]) {
+    try {
+      const response = await axiosInstance.request<ApiResponse<void>>({
+        method: "DELETE",
+        url: `/api/v2/admin/reports/posts`,
+        data: {
+          postIds,
+        },
       });
       return response.data;
     } catch (error) {

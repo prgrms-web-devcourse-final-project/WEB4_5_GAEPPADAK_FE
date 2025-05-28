@@ -40,6 +40,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setIsLoggedIn(true);
     } catch (error) {
       console.error("Failed to fetch current user:", error);
+      // 인증 실패 시 명확하게 로그아웃 상태로 설정
       setCurrentUser(null);
       setIsLoggedIn(false);
     } finally {

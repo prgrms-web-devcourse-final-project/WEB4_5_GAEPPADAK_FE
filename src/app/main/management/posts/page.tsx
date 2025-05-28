@@ -8,11 +8,11 @@ export default function PostsManagementPage() {
   const [posts, setPosts] = useState<IPost.ISummaryForAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPosts, setSelectedPosts] = useState<Set<number>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [query, setQuery] = useState<IPost.GetListQueryDtoForAdmin>({
-    page: 1,
+    page: currentPage,
     size: 10,
     sort: "reportedAt",
     searchTarget: "post_title",
@@ -81,7 +81,7 @@ export default function PostsManagementPage() {
     if (selectedPosts.size === posts.length) {
       setSelectedPosts(new Set());
     } else {
-      setSelectedPosts(new Set(posts.map((post) => post.keywordId)));
+      setSelectedPosts(new Set(posts.map((post) => post.postId)));
     }
   };
 
@@ -115,10 +115,12 @@ export default function PostsManagementPage() {
       // TODO: API 호출 - postService.rejectReport(postId)
       console.log("신고 거부:", postId);
 
-      // 상태 업데이트
+      // 상태를 거부됨으로 변경
       setPosts((prev) =>
         prev.map((post) =>
-          post.keywordId === postId ? { ...post, status: "REJECTED" } : post
+          selectedPosts.has(post.postId)
+            ? { ...post, status: "REJECTED" }
+            : post
         )
       );
 
@@ -144,16 +146,11 @@ export default function PostsManagementPage() {
 
     try {
       setLoading(true);
-      // TODO: API 호출 - postService.bulkApproveReports(Array.from(selectedPosts))
-      console.log("일괄 승인:", Array.from(selectedPosts));
+      await postService.approveReport(Array.from(selectedPosts));
 
-      // 상태 업데이트
+      // 처리된 항목을 화면에서 제거
       setPosts((prev) =>
-        prev.map((post) =>
-          selectedPosts.has(post.keywordId)
-            ? { ...post, status: "APPROVED" }
-            : post
-        )
+        prev.filter((post) => !selectedPosts.has(post.postId))
       );
 
       setSelectedPosts(new Set());
@@ -179,13 +176,12 @@ export default function PostsManagementPage() {
 
     try {
       setLoading(true);
-      // TODO: API 호출 - postService.bulkRejectReports(Array.from(selectedPosts))
-      console.log("일괄 거부:", Array.from(selectedPosts));
+      await postService.rejectReport(Array.from(selectedPosts));
 
-      // 상태 업데이트
+      // 상태를 거부됨으로 변경
       setPosts((prev) =>
         prev.map((post) =>
-          selectedPosts.has(post.keywordId)
+          selectedPosts.has(post.postId)
             ? { ...post, status: "REJECTED" }
             : post
         )
@@ -389,29 +385,29 @@ export default function PostsManagementPage() {
                 </tr>
               ) : (
                 posts.map((post) => (
-                  <tr key={post.keywordId} className="hover:bg-gray-600">
+                  <tr key={post.postId} className="hover:bg-gray-600">
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
-                        checked={selectedPosts.has(post.keywordId)}
-                        onChange={() => handleSelectPost(post.keywordId)}
+                        checked={selectedPosts.has(post.postId)}
+                        onChange={() => handleSelectPost(post.postId)}
                         className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 max-w-xs truncate font-medium">
-                      포스트 제목 {post.keywordId}
+                      {post.title}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300 max-w-xs truncate">
-                      포스트에 대한 내용. 길을 넘어가면 ...처리
+                      {post.summary}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
-                      키워드명
+                      {post.keyword}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
                       {getReportReasonText(post.reportReason)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      {new Date(post.reportAt).toLocaleDateString()}
+                      {new Date(post.reportedAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
                       {post.reportCount}
@@ -422,32 +418,6 @@ export default function PostsManagementPage() {
                       >
                         {getStatusText(post.status)}
                       </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {post.status === "PENDING" ? (
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => handleApproveReport(post.keywordId)}
-                            disabled={actionLoading === post.keywordId}
-                            className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {actionLoading === post.keywordId
-                              ? "처리중..."
-                              : "승인"}
-                          </button>
-                          <button
-                            onClick={() => handleRejectReport(post.keywordId)}
-                            disabled={actionLoading === post.keywordId}
-                            className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {actionLoading === post.keywordId
-                              ? "처리중..."
-                              : "거부"}
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-xs">처리완료</span>
-                      )}
                     </td>
                   </tr>
                 ))

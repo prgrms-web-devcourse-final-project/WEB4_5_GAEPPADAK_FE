@@ -12,7 +12,7 @@ import LoadingSpinner from "@src/components/ui/LoadingSpinner";
 export default function PopularVideosPage() {
   // 상태 관리
   const [videoList, setVideoList] = useState<IVideo.ISummary[]>([]);
-  const [newsList, setNewsList] = useState<INews.ISummary[]>([]);
+  const [newsList, setNewsList] = useState<INews.ISummaryTop[]>([]);
   const [videoLoading, setVideoLoading] = useState(true);
   const [newsLoading, setNewsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -194,56 +194,61 @@ export default function PopularVideosPage() {
       <div className="space-y-5">
         {videoList.length > 0 ? (
           videoList.map((video, index) => (
-            <div
+            <Link
               key={video.videoId || index}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md border border-gray-100 dark:border-gray-700"
+              href={video.url || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block group"
             >
-              <div className="flex flex-col md:flex-row">
-                {/* 썸네일 */}
-                <div className="md:w-32 md:h-32 h-48 relative bg-gray-100 dark:bg-gray-700 flex-shrink-0">
-                  {video.thumbnailUrl ? (
-                    <Image
-                      src={video.thumbnailUrl}
-                      alt={video.title || ""}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-12 h-12"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md border border-gray-100 dark:border-gray-700 group-hover:scale-[1.02]">
+                <div className="flex flex-col md:flex-row">
+                  {/* 썸네일 */}
+                  <div className="md:w-32 md:h-32 h-48 relative bg-gray-100 dark:bg-gray-700 flex-shrink-0">
+                    {video.thumbnailUrl ? (
+                      <Image
+                        src={video.thumbnailUrl}
+                        alt={video.title || ""}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-12 h-12"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
 
-                {/* 내용 */}
-                <div className="flex-1 p-5">
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-                    {video.title || `유튜브 제목 ${index + 1}`}
-                  </h3>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded-full"></span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {video.publishedAt
-                        ? formatDate(video.publishedAt)
-                        : "(유튜브 게시 시간 표시)"}
-                    </span>
+                  {/* 내용 */}
+                  <div className="flex-1 p-5">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {video.title}
+                    </h3>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded-full">
+                        YouTube
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {formatDate(video.publishedAt)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))
         ) : (
           // 유튜브가 없는 경우 메시지 표시
@@ -282,7 +287,7 @@ export default function PopularVideosPage() {
             연관 뉴스
           </h2>
           <Link
-            href="/news"
+            href="/main/popular-news"
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
           >
             더보기
@@ -297,7 +302,7 @@ export default function PopularVideosPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {newsList.map((news, index) => (
               <Link
-                key={news.newsId || index}
+                key={news.sourceId || index}
                 href={news.url || "#"}
                 className="group"
               >
