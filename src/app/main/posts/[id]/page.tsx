@@ -427,28 +427,16 @@ export default function PostDetailPage() {
 
           {/* 썸네일 이미지 */}
           <div className="px-6 py-8">
-            <div className="w-full aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden relative mb-6">
-              {post.thumbnailUrl ? (
+            {post.thumbnailUrl ?? (
+              <div className="w-full aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden relative mb-6">
                 <Image
                   src={post.thumbnailUrl}
                   alt={post.title}
                   fill
                   className="object-cover"
                 />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-32">
-                    <Image
-                      src="/sample-image.png"
-                      alt="Sample"
-                      width={150}
-                      height={100}
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* 포스트 내용 */}
             <div className="prose dark:prose-invert max-w-none">
