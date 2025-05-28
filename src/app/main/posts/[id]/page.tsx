@@ -77,6 +77,16 @@ export default function PostDetailPage() {
       await commentService.reportComment(reportingComment, reportReason);
       alert("신고가 접수되었습니다.");
       closeReportModal();
+
+      // 댓글 목록 새로고침하여 reportedByMe 상태 업데이트
+      const { list, meta } = await commentService.getComments(postId, {
+        page: currentPage - 1,
+        size: 10,
+        sort: "createdAt,DESC",
+      });
+      setComments(list);
+      setCommentCount(meta.totalElements);
+      setTotalPages(meta.totalPages);
     } catch (error) {
       console.error("Error reporting comment:", error);
       alert("신고 처리에 실패했습니다.");
@@ -683,6 +693,7 @@ export default function PostDetailPage() {
                       {/* 남의 댓글인 경우에만 신고 버튼 표시 */}
                       {isLoggedIn &&
                         !isMyComment(comment.nickname) &&
+                        !comment.reportedByMe &&
                         editingComment !== comment.commentId && (
                           <button
                             onClick={() => openReportModal(comment.commentId)}
