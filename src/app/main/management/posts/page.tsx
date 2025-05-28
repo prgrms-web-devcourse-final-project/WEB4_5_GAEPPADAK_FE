@@ -8,11 +8,11 @@ export default function PostsManagementPage() {
   const [posts, setPosts] = useState<IPost.ISummaryForAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPosts, setSelectedPosts] = useState<Set<number>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [query, setQuery] = useState<IPost.GetListQueryDtoForAdmin>({
-    page: 1,
+    page: currentPage,
     size: 10,
     sort: "reportedAt",
     searchTarget: "post_title",
@@ -399,19 +399,19 @@ export default function PostsManagementPage() {
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 max-w-xs truncate font-medium">
-                      포스트 제목 {post.keywordId}
+                      {post.title}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300 max-w-xs truncate">
-                      포스트에 대한 내용. 길을 넘어가면 ...처리
+                      {post.summary}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
-                      키워드명
+                      {post.keyword}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
                       {getReportReasonText(post.reportReason)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      {new Date(post.reportAt).toLocaleDateString()}
+                      {new Date(post.reportedAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
                       {post.reportCount}
@@ -422,32 +422,6 @@ export default function PostsManagementPage() {
                       >
                         {getStatusText(post.status)}
                       </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {post.status === "PENDING" ? (
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => handleApproveReport(post.keywordId)}
-                            disabled={actionLoading === post.keywordId}
-                            className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {actionLoading === post.keywordId
-                              ? "처리중..."
-                              : "승인"}
-                          </button>
-                          <button
-                            onClick={() => handleRejectReport(post.keywordId)}
-                            disabled={actionLoading === post.keywordId}
-                            className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {actionLoading === post.keywordId
-                              ? "처리중..."
-                              : "거부"}
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400 text-xs">처리완료</span>
-                      )}
                     </td>
                   </tr>
                 ))

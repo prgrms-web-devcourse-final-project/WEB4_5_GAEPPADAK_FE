@@ -23,15 +23,15 @@ export namespace IPost {
   }
 
   export interface ISummaryForAdmin {
+    keyword: string;
     keywordId: number;
-
-    reportReason: ReportReason[];
-
-    reportAt: string;
-
+    postId: number;
     reportCount: number;
-
+    reportReason: ReportReason[];
+    reportedAt: string;
     status: string;
+    summary: string;
+    title: string;
   }
 
   export class GetListQueryDto {
