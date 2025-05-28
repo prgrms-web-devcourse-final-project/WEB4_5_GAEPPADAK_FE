@@ -106,6 +106,35 @@ export class CommentService {
       throw error;
     }
   }
+
+  async approveReport(commentIds: number[]) {
+    try {
+      const response = await axiosInstance.post<ApiResponse<void>>(
+        `/api/v2/admin/reports/comments`,
+        { commentIds }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async rejectReport(commentIds: number[]) {
+    try {
+      const response = await axiosInstance.request<ApiResponse<void>>({
+        method: "DELETE",
+        url: `/api/v2/admin/reports/comments`,
+        data: {
+          commentIds,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export const commentService = new CommentService();
