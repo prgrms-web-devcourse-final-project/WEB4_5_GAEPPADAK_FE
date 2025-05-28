@@ -38,6 +38,7 @@ export default function PostDetailPage() {
   const [reportReason, setReportReason] = useState<
     IComment.ReportReason | IPost.ReportReason | null
   >(null);
+  const [etcReason, setEtcReason] = useState<string>("");
 
   // Context에서 사용자 정보 가져오기
   const { currentUser, isLoggedIn } = useUser();
@@ -51,12 +52,14 @@ export default function PostDetailPage() {
   const openReportModal = (commentId: number) => {
     setReportingComment(commentId);
     setReportReason(null);
+    setEtcReason("");
   };
 
   // 포스트 신고 모달 열기
   const openPostReportModal = () => {
     setReportingPost(true);
     setReportReason(null);
+    setEtcReason("");
   };
 
   // 댓글 신고 모달 닫기
@@ -64,6 +67,7 @@ export default function PostDetailPage() {
     setReportingComment(null);
     setReportingPost(false);
     setReportReason(null);
+    setEtcReason("");
   };
 
   // 댓글 신고 처리
@@ -73,8 +77,22 @@ export default function PostDetailPage() {
       return;
     }
 
+    // 기타 사유가 선택되었는데 사유를 입력하지 않은 경우
+    if (reportReason === IComment.ReportReason.ETC && !etcReason.trim()) {
+      alert("기타 사유를 입력해주세요.");
+      return;
+    }
+
     try {
-      await commentService.reportComment(reportingComment, reportReason);
+      const reportDto: IComment.ReportDto = {
+        reason: reportReason as IComment.ReportReason,
+        ...(reportReason === IComment.ReportReason.ETC &&
+          etcReason.trim() && {
+            etcReason: etcReason,
+          }),
+      };
+
+      await commentService.reportComment(reportingComment, reportDto);
       alert("신고가 접수되었습니다.");
       closeReportModal();
 
@@ -997,6 +1015,26 @@ export default function PostDetailPage() {
                 />
                 <span className="text-gray-700 dark:text-gray-300">기타</span>
               </label>
+
+              {/* 기타 사유 입력란 */}
+              {reportReason ===
+                (reportingPost
+                  ? IPost.ReportReason.ETC
+                  : IComment.ReportReason.ETC) && (
+                <div className="ml-6 mt-2">
+                  <textarea
+                    value={etcReason}
+                    onChange={(e) => setEtcReason(e.target.value)}
+                    placeholder="기타 사유를 입력해주세요"
+                    maxLength={200}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  />
+                  <div className="text-right text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {etcReason.length}/200
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 justify-end">

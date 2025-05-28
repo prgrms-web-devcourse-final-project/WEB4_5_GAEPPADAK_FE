@@ -80,14 +80,14 @@ export class CommentService {
 
   async reportComment(
     commentId: number,
-    reason: IComment.ReportReason
+    reportDto: IComment.ReportDto
   ): Promise<ApiResponse<void>> {
     try {
       const response = await axiosInstance.post<
         ApiResponse<void>,
         AxiosResponse<ApiResponse<void>>,
         IComment.ReportDto
-      >(`/api/v2/reports/comments/${commentId}`, { reason });
+      >(`/api/v2/reports/comments/${commentId}`, reportDto);
       return response.data;
     } catch (error) {
       console.error(error);
