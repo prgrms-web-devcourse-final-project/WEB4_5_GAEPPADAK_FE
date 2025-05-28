@@ -10,7 +10,7 @@ export default function MembersManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [query, setQuery] = useState<IMember.GetListQueryDtoForAdmin>({
-    page: 1,
+    page: currentPage - 1,
     size: 10,
     searchTarget: "nickname",
     searchValue: "",
@@ -54,21 +54,22 @@ export default function MembersManagementPage() {
   // 역할 변경 처리
   const handleRoleChange = async (
     memberId: string,
-    newRole: IMember.roleType
+    newBlockType: IMember.blockType
   ) => {
     try {
-      // TODO: API 호출 - memberService.updateRole(memberId, newRole)
-      console.log("역할 변경:", memberId, newRole);
+      await memberService.updateMemberRole(parseInt(memberId), newBlockType);
 
       // 상태 업데이트
       setMembers((prev) =>
         prev.map((member) =>
-          member.memberId === memberId ? { ...member, role: newRole } : member
+          member.memberId === memberId
+            ? { ...member, blockType: newBlockType }
+            : member
         )
       );
 
       alert(
-        `역할이 ${newRole === "ADMIN" ? "관리자" : "일반 사용자"}로 변경되었습니다.`
+        `상태가 ${newBlockType === "BLACK" ? "차단" : "정상"}으로 변경되었습니다.`
       );
     } catch (error) {
       console.error("역할 변경 실패:", error);
@@ -81,11 +82,23 @@ export default function MembersManagementPage() {
     return role === "ADMIN" ? "관리자" : "유저";
   };
 
+  // 차단 상태 표시
+  const getBlockText = (blockType: IMember.blockType) => {
+    return blockType === "BLACK" ? "차단" : "정상";
+  };
+
   // 역할별 색상
   const getRoleColor = (role: IMember.roleType) => {
     return role === "ADMIN"
       ? "text-blue-600 bg-blue-100"
       : "text-gray-600 bg-gray-100";
+  };
+
+  // 차단 상태별 색상
+  const getBlockColor = (blockType: IMember.blockType) => {
+    return blockType === "BLACK"
+      ? "text-red-600 bg-red-100"
+      : "text-green-600 bg-green-100";
   };
 
   return (
@@ -155,7 +168,7 @@ export default function MembersManagementPage() {
                   이메일
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
-                  역할
+                  역할/상태
                 </th>
               </tr>
             </thead>
@@ -193,19 +206,26 @@ export default function MembersManagementPage() {
                         >
                           {getRoleText(member.role)}
                         </span>
-                        <select
-                          value={member.role}
-                          onChange={(e) =>
-                            handleRoleChange(
-                              member.memberId,
-                              e.target.value as IMember.roleType
-                            )
-                          }
-                          className="text-xs border border-gray-500 rounded px-2 py-1 bg-gray-600 text-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        >
-                          <option value="USER">유저</option>
-                          <option value="ADMIN">관리자</option>
-                        </select>
+                        {member.role === "USER" && (
+                          <select
+                            value={member.blockType || "USER"}
+                            onChange={(e) =>
+                              handleRoleChange(
+                                member.memberId,
+                                e.target.value as IMember.blockType
+                              )
+                            }
+                            className="text-xs border border-gray-500 rounded px-2 py-1 bg-gray-600 text-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option value="USER">정상</option>
+                            <option value="BLACK">차단</option>
+                          </select>
+                        )}
+                        {member.role === "ADMIN" && (
+                          <span className="text-xs text-gray-400">
+                            변경 불가
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>

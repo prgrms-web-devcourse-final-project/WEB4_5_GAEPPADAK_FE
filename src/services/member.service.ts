@@ -24,6 +24,21 @@ class MemberService {
       throw error;
     }
   }
+
+  async updateMemberRole(memberId: number, role: string) {
+    try {
+      const response = await axiosInstance.patch(
+        `/api/v2/admin/members/${memberId}`,
+        {
+          role: role,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export const memberService = new MemberService();

@@ -1,6 +1,8 @@
 export namespace IMember {
   export type roleType = "USER" | "ADMIN";
 
+  export type blockType = "USER" | "BLACK";
+
   export interface IBase {
     email: string;
 
@@ -17,6 +19,8 @@ export namespace IMember {
     memberId: string;
 
     nickname: string;
+
+    blockType?: blockType;
   }
 
   export class GetListQueryDtoForAdmin {
