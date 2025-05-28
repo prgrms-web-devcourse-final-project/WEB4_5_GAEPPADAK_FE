@@ -25,7 +25,7 @@ class MemberService {
     }
   }
 
-  async updateMemberRole(memberId: number, role: string) {
+  async updateMemberRole(memberId: string, role: string) {
     try {
       const response = await axiosInstance.patch(
         `/api/v2/admin/members/${memberId}`,

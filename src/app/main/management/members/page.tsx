@@ -57,7 +57,7 @@ export default function MembersManagementPage() {
     newBlockType: IMember.blockType
   ) => {
     try {
-      await memberService.updateMemberRole(parseInt(memberId), newBlockType);
+      await memberService.updateMemberRole(memberId, newBlockType);
 
       // 상태 업데이트
       setMembers((prev) =>
