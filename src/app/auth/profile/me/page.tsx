@@ -6,6 +6,7 @@ import { useUser } from "@/src/contexts/UserContext";
 import LoadingSpinner from "@src/components/ui/LoadingSpinner";
 import Image from "next/image";
 import { authService } from "@src/services/auth.service";
+import { AxiosError } from "axios";
 
 export default function ProfileEditPage() {
   const { currentUser, isLoggedIn, logout } = useUser();
@@ -206,7 +207,16 @@ export default function ProfileEditPage() {
       router.push("/main");
     } catch (error) {
       console.error("프로필 업데이트 실패:", error);
-      alert("프로필 업데이트에 실패했습니다.");
+
+      // API 응답에서 에러 메시지 추출
+      let errorMessage = "프로필 업데이트에 실패했습니다.";
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -238,7 +248,16 @@ export default function ProfileEditPage() {
       router.push("/main");
     } catch (error) {
       console.error("회원 탈퇴 실패:", error);
-      alert("회원 탈퇴에 실패했습니다.");
+
+      // API 응답에서 에러 메시지 추출
+      let errorMessage = "회원 탈퇴에 실패했습니다.";
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
