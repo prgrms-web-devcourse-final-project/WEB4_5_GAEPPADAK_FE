@@ -115,10 +115,12 @@ export default function PostsManagementPage() {
       // TODO: API 호출 - postService.rejectReport(postId)
       console.log("신고 거부:", postId);
 
-      // 상태 업데이트
+      // 상태를 거부됨으로 변경
       setPosts((prev) =>
         prev.map((post) =>
-          post.keywordId === postId ? { ...post, status: "REJECTED" } : post
+          selectedPosts.has(post.postId)
+            ? { ...post, status: "REJECTED" }
+            : post
         )
       );
 
@@ -176,9 +178,13 @@ export default function PostsManagementPage() {
       setLoading(true);
       await postService.rejectReport(Array.from(selectedPosts));
 
-      // 처리된 항목을 화면에서 제거
+      // 상태를 거부됨으로 변경
       setPosts((prev) =>
-        prev.filter((post) => !selectedPosts.has(post.postId))
+        prev.map((post) =>
+          selectedPosts.has(post.postId)
+            ? { ...post, status: "REJECTED" }
+            : post
+        )
       );
 
       setSelectedPosts(new Set());
