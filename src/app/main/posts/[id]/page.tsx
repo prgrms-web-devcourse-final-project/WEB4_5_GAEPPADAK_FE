@@ -118,10 +118,28 @@ export default function PostDetailPage() {
       return;
     }
 
+    // 기타 사유가 선택되었는데 사유를 입력하지 않은 경우
+    if (reportReason === IPost.ReportReason.ETC && !etcReason.trim()) {
+      alert("기타 사유를 입력해주세요.");
+      return;
+    }
+
     try {
-      await postService.reportPost(postId, reportReason as IPost.ReportReason);
+      const reportDto: IPost.ReportDto = {
+        reason: reportReason as IPost.ReportReason,
+        ...(reportReason === IPost.ReportReason.ETC &&
+          etcReason.trim() && {
+            etcReason: etcReason,
+          }),
+      };
+
+      await postService.reportPost(postId, reportDto);
       alert("신고가 접수되었습니다.");
       closeReportModal();
+
+      // 포스트 정보 새로고침하여 reportedByMe 상태 업데이트
+      const response = await postService.getDetail(postId);
+      setPost(response.data);
     } catch (error) {
       console.error("Error reporting post:", error);
       alert("신고 처리에 실패했습니다.");
@@ -459,7 +477,7 @@ export default function PostDetailPage() {
               </span>
 
               {/* 포스트 신고 버튼 */}
-              {isLoggedIn && (
+              {isLoggedIn && !post.reportedByMe && (
                 <button
                   onClick={openPostReportModal}
                   className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors cursor-pointer"
