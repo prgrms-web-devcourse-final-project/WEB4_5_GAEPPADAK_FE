@@ -9,7 +9,7 @@ import { authService } from "@src/services/auth.service";
 import { AxiosError } from "axios";
 
 export default function ProfileEditPage() {
-  const { currentUser, isLoggedIn, logout } = useUser();
+  const { currentUser, isLoggedIn, logout, loading: userLoading } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -30,6 +30,11 @@ export default function ProfileEditPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
+    // UserContext 로딩 중이면 대기
+    if (userLoading) {
+      return;
+    }
+
     // 로그인 상태 확인
     if (!isLoggedIn) {
       router.push("/auth/signin");
@@ -51,7 +56,7 @@ export default function ProfileEditPage() {
     }
 
     setLoading(false);
-  }, [isLoggedIn, router, currentUser]);
+  }, [userLoading, isLoggedIn, router, currentUser]);
 
   // 입력 값 변경 처리
   const handleInputChange = (field: string, value: string) => {
@@ -273,7 +278,7 @@ export default function ProfileEditPage() {
     }
   };
 
-  if (loading) {
+  if (userLoading || loading) {
     return <LoadingSpinner />;
   }
 
