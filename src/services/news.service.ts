@@ -18,7 +18,7 @@ class NewsService {
   async getPopularNews(query: INews.GetListQueryDto) {
     try {
       const response = await axiosInstance.get<
-        ApiResponse<IPagination.IOffset<INews.ISummary[]>>
+        ApiResponse<IPagination.IOffset<INews.ISummaryTop[]>>
       >("/api/v1/news/top", {
         params: query,
       });

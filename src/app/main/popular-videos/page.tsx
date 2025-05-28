@@ -12,7 +12,7 @@ import LoadingSpinner from "@src/components/ui/LoadingSpinner";
 export default function PopularVideosPage() {
   // 상태 관리
   const [videoList, setVideoList] = useState<IVideo.ISummary[]>([]);
-  const [newsList, setNewsList] = useState<INews.ISummary[]>([]);
+  const [newsList, setNewsList] = useState<INews.ISummaryTop[]>([]);
   const [videoLoading, setVideoLoading] = useState(true);
   const [newsLoading, setNewsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -302,7 +302,7 @@ export default function PopularVideosPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {newsList.map((news, index) => (
               <Link
-                key={news.newsId || index}
+                key={news.sourceId || index}
                 href={news.url || "#"}
                 className="group"
               >

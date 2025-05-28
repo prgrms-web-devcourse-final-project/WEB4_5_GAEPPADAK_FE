@@ -11,7 +11,7 @@ import LoadingSpinner from "@src/components/ui/LoadingSpinner";
 
 export default function PopularNewsPage() {
   // 상태 관리
-  const [newsList, setNewsList] = useState<INews.ISummary[]>([]);
+  const [newsList, setNewsList] = useState<INews.ISummaryTop[]>([]);
   const [videoList, setVideoList] = useState<IVideo.ISummary[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
   const [videoLoading, setVideoLoading] = useState(true);
@@ -239,7 +239,7 @@ export default function PopularNewsPage() {
         {newsList.length > 0 ? (
           newsList.map((news, index) => (
             <div
-              key={news.newsId || index}
+              key={news.sourceId || index}
               className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md border border-gray-100 dark:border-gray-700"
             >
               <div className="flex flex-col md:flex-row">
@@ -278,12 +278,9 @@ export default function PopularNewsPage() {
                     {news.title}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                    {news.summary || "뉴스 내용..."}
+                    {news.description}
                   </p>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
-                      뉴스
-                    </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       {news.publishedAt ? formatDate(news.publishedAt) : ""}
                     </span>
