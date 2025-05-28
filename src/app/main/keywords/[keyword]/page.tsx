@@ -330,16 +330,33 @@ export default function KeywordDetailPage() {
                 href={news.url || "#"}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
               >
-                {news.thumbnailUrl && (
-                  <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 relative flex items-center justify-center">
+                <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 relative flex items-center justify-center">
+                  {news.thumbnailUrl && news.thumbnailUrl.trim() !== "" ? (
                     <Image
                       src={news.thumbnailUrl}
                       alt={news.title}
                       fill
                       className="object-cover rounded-lg"
                     />
-                  </div>
-                )}
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-8 h-8"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white text-center mb-2">
                   {news.source}
                 </p>
