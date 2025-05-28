@@ -192,13 +192,23 @@ export default function ProfileEditPage() {
     setLoading(true);
     try {
       // 프로필 업데이트 API 호출
-      const updateData: { nickname: string; password?: string } = {
-        nickname: formData.nickname,
-      };
+      const updateData: { nickname?: string; password?: string } = {};
+
+      // 닉네임이 변경된 경우에만 포함
+      if (formData.nickname !== currentUser?.nickname) {
+        updateData.nickname = formData.nickname;
+      }
 
       // 비밀번호가 입력된 경우에만 포함
       if (formData.newPassword.trim()) {
         updateData.password = formData.newPassword;
+      }
+
+      // 변경사항이 없으면 요청하지 않음
+      if (Object.keys(updateData).length === 0) {
+        alert("변경된 정보가 없습니다.");
+        setLoading(false);
+        return;
       }
 
       await authService.patchProfile(updateData);
@@ -297,7 +307,7 @@ export default function ProfileEditPage() {
             onClick={() => setIsEditing(!isEditing)}
             className="px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors cursor-pointer"
           >
-            정보 수정
+            {isEditing ? "수정 취소" : "정보 수정"}
           </button>
         </div>
 
