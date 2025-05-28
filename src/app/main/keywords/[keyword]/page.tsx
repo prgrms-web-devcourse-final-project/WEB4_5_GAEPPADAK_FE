@@ -334,20 +334,17 @@ export default function KeywordDetailPage() {
                   <div className="w-full h-24 bg-gray-100 dark:bg-gray-700 rounded-lg mb-2 relative flex items-center justify-center">
                     <Image
                       src={news.thumbnailUrl}
-                      alt={news.title || "뉴스 썸네일"}
+                      alt={news.title}
                       fill
                       className="object-cover rounded-lg"
                     />
                   </div>
                 )}
                 <p className="text-sm font-medium text-gray-900 dark:text-white text-center mb-2">
-                  {news.source || "썸네일 이미지"}
+                  {news.source}
                 </p>
                 <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
-                  {news.title || "뉴스 제목"}
-                </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded text-center">
-                  뉴스 채팅
+                  {news.title}
                 </p>
               </Link>
             ))}

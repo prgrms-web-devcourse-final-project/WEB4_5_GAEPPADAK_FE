@@ -42,11 +42,11 @@ class PostService {
     }
   }
 
-  async reportPost(postId: number, reason: IPost.ReportReason) {
+  async reportPost(postId: number, reportDto: IPost.ReportDto) {
     try {
       const response = await axiosInstance.post<ApiResponse<void>>(
         `/api/v2/reports/posts/${postId}`,
-        { reason }
+        reportDto
       );
       return response.data;
     } catch (error) {

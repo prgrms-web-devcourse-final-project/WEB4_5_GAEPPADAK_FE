@@ -13,6 +13,7 @@ export namespace IPost {
     title: string;
     summary: string;
     thumbnailUrl: string;
+    reportedByMe: boolean;
   }
 
   export interface ISummary extends IBase {
@@ -41,6 +42,12 @@ export namespace IPost {
     size: number = 10;
 
     sort: "createdAt" | "viewCount" = "createdAt";
+  }
+
+  export class ReportDto {
+    reason!: ReportReason;
+
+    etcReason?: string;
   }
 
   export type SortKey = "reportedAt" | "reportCount";
