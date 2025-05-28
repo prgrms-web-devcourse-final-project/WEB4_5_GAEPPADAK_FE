@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { authService } from "../../../services/auth.service";
 import { IAuth } from "../../../../types";
 import { AxiosError } from "axios";
+import { useUser } from "@/src/contexts/UserContext";
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +19,7 @@ const SignIn: React.FC = () => {
   const [error, setError] = useState("");
 
   const router = useRouter();
+  const { refreshUser } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +39,9 @@ const SignIn: React.FC = () => {
       };
 
       await authService.signin(signInDto);
+
+      // 로그인 성공 후 사용자 정보 새로고침
+      await refreshUser();
 
       setIsRedirecting(true);
       setTimeout(() => {

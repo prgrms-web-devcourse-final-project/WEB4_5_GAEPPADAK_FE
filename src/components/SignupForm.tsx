@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "@src/services/auth.service";
 import { AxiosError } from "axios";
+import { useUser } from "@/src/contexts/UserContext";
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -28,6 +29,7 @@ const SignupForm: React.FC = () => {
   const [nicknameError, setNicknameError] = useState("");
 
   const router = useRouter();
+  const { refreshUser } = useUser();
 
   // 유효성 검사 함수들
   const validateEmail = (email: string) => {

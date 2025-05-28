@@ -8,7 +8,7 @@ import Image from "next/image";
 import { authService } from "@src/services/auth.service";
 
 export default function ProfileEditPage() {
-  const { currentUser, isLoggedIn } = useUser();
+  const { currentUser, isLoggedIn, logout } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -230,6 +230,9 @@ export default function ProfileEditPage() {
     try {
       // 회원 탈퇴 API 호출
       await authService.deleteAccount();
+
+      // 회원탈퇴 성공 후 UserContext 상태 업데이트
+      logout();
 
       alert("회원 탈퇴가 완료되었습니다.");
       router.push("/main");

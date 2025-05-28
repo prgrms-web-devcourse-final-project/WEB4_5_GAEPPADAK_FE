@@ -80,11 +80,16 @@ export const Header: React.FC<HeaderProps> = ({
   // 로그아웃 처리
   const handleLogout = async () => {
     try {
+      // 먼저 Context 상태를 업데이트하여 UI를 즉시 반영
+      contextLogout();
+
+      // 그 다음 서버에 로그아웃 요청
       await authService.signout();
-      contextLogout(); // Context의 로그아웃 함수 호출
+
       router.push("/main");
     } catch (error) {
       console.error("로그아웃 실패:", error);
+      // 서버 요청이 실패해도 클라이언트 상태는 이미 로그아웃됨
     }
   };
 
