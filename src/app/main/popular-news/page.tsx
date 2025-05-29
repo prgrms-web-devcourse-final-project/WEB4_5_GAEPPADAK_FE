@@ -284,7 +284,7 @@ export default function PopularNewsPage() {
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {news.title}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-1">
                       {news.description}
                     </p>
                     <div className="flex justify-end items-center">
