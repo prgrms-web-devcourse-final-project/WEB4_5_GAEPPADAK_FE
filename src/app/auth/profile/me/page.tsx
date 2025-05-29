@@ -422,47 +422,49 @@ export default function ProfileEditPage() {
             </div>
 
             {/* 새 비밀번호 */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                새 비밀번호
-              </label>
-              <input
-                type="password"
-                value={formData.newPassword}
-                onChange={(e) =>
-                  handleInputChange("newPassword", e.target.value)
-                }
-                disabled={!isEditing}
-                placeholder="변경하지 않으려면 비워두세요"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              {errors.newPassword && (
-                <p className="text-red-500 dark:text-red-400 text-sm mt-1">
-                  {errors.newPassword}
-                </p>
-              )}
-            </div>
+            {isEditing && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  새 비밀번호
+                </label>
+                <input
+                  type="password"
+                  value={formData.newPassword}
+                  onChange={(e) =>
+                    handleInputChange("newPassword", e.target.value)
+                  }
+                  placeholder="변경하지 않으려면 비워두세요"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {errors.newPassword && (
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                    {errors.newPassword}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* 비밀번호 재입력 */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                비밀번호 재입력
-              </label>
-              <input
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  handleInputChange("confirmPassword", e.target.value)
-                }
-                disabled={!isEditing}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              {errors.confirmPassword && (
-                <p className="text-red-500 dark:text-red-400 text-sm mt-1">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
+            {isEditing && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  비밀번호 재입력
+                </label>
+                <input
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    handleInputChange("confirmPassword", e.target.value)
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {errors.confirmPassword && (
+                  <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                    {errors.confirmPassword}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 하단 버튼들 */}

@@ -16,7 +16,7 @@ export default function CommentsManagementPage() {
   const [query, setQuery] = useState<IComment.GetListQueryDtoForAdmin>({
     page: 0,
     size: 10,
-    sort: "reportedAt",
+    sort: "reportedAt,DESC",
     searchTarget: "post_title",
     searchValue: "",
   });

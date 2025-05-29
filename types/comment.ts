@@ -80,14 +80,14 @@ export namespace IComment {
     | "comment_body"
     | "report_reason";
 
-  export type SortKey = "reportedAt" | "reportCount";
+  export type SortKey = "reportedAt,DESC" | "reportCount,DESC";
 
   export class GetListQueryDtoForAdmin {
     page!: number;
 
     size!: number;
 
-    sort: SortKey = "reportedAt";
+    sort: SortKey = "reportedAt,DESC";
 
     searchTarget: SearchTarget = "post_title";
 
