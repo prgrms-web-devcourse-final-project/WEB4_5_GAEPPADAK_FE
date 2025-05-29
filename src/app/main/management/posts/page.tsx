@@ -329,7 +329,7 @@ export default function PostsManagementPage() {
       {/* 테이블 */}
       <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[1200px]">
             <thead className="bg-gray-600 border-b border-gray-500">
               <tr>
                 <th className="w-12 px-4 py-3 text-left">
@@ -342,25 +342,25 @@ export default function PostsManagementPage() {
                     className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   포스트 제목
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   포스트 내용
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   키워드
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   신고 사유
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   최근 신고 날짜
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   신고 횟수
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   상태
                 </th>
               </tr>
@@ -368,7 +368,7 @@ export default function PostsManagementPage() {
             <tbody className="divide-y divide-gray-600">
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center">
+                  <td colSpan={8} className="px-4 py-8 text-center">
                     <div className="flex justify-center">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                     </div>
@@ -377,7 +377,7 @@ export default function PostsManagementPage() {
               ) : posts.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={9}
+                    colSpan={8}
                     className="px-4 py-8 text-center text-gray-300"
                   >
                     신고된 게시글이 없습니다.
@@ -394,22 +394,28 @@ export default function PostsManagementPage() {
                         className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                       />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 max-w-xs truncate font-medium">
-                      {post.title}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-300 max-w-xs truncate">
-                      {post.summary}
-                    </td>
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
-                      {post.keyword}
+                      <div className="max-w-[200px] truncate">{post.title}</div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      {getReportReasonText(post.reportReason)}
+                      <div className="max-w-[250px] truncate">
+                        {post.summary}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                      <div className="max-w-[120px] truncate">
+                        {post.keyword}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-300">
+                      <div className="max-w-[150px] truncate">
+                        {getReportReasonText(post.reportReason)}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
                       {new Date(post.reportedAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                    <td className="px-4 py-3 text-sm text-gray-100 font-medium text-center">
                       {post.reportCount}
                     </td>
                     <td className="px-4 py-3">
