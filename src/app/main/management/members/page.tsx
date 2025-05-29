@@ -7,10 +7,10 @@ import { IMember, IPagination } from "@/types";
 export default function MembersManagementPage() {
   const [members, setMembers] = useState<IMember.ISummaryForAdmin[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [query, setQuery] = useState<IMember.GetListQueryDtoForAdmin>({
-    page: currentPage - 1,
+    page: 0,
     size: 10,
     searchTarget: "nickname",
     searchValue: "",
@@ -36,8 +36,8 @@ export default function MembersManagementPage() {
 
   // 검색 처리
   const handleSearch = () => {
-    setQuery((prev) => ({ ...prev, page: 1 }));
-    setCurrentPage(1);
+    setQuery((prev) => ({ ...prev, page: 0 }));
+    setCurrentPage(0);
   };
 
   // 검색어 변경
@@ -242,7 +242,7 @@ export default function MembersManagementPage() {
           <nav className="flex items-center space-x-2">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              disabled={currentPage === 0}
               className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -256,7 +256,7 @@ export default function MembersManagementPage() {
 
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               const pageNum =
-                Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                Math.max(0, Math.min(totalPages - 4, currentPage - 2)) + i;
               return (
                 <button
                   key={pageNum}
@@ -267,14 +267,14 @@ export default function MembersManagementPage() {
                       : "border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500"
                   }`}
                 >
-                  {pageNum}
+                  {pageNum + 1}
                 </button>
               );
             })}
 
             <button
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages - 1}
               className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

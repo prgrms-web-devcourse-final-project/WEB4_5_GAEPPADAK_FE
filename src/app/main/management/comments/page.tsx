@@ -11,10 +11,10 @@ export default function CommentsManagementPage() {
   const [selectedComments, setSelectedComments] = useState<Set<number>>(
     new Set()
   );
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [query, setQuery] = useState<IComment.GetListQueryDtoForAdmin>({
-    page: currentPage - 1,
+    page: 0,
     size: 10,
     sort: "reportedAt",
     searchTarget: "post_title",
@@ -41,14 +41,14 @@ export default function CommentsManagementPage() {
 
   // 검색 처리
   const handleSearch = () => {
-    setQuery((prev) => ({ ...prev, page: 1 }));
-    setCurrentPage(1);
+    setQuery((prev) => ({ ...prev, page: 0 }));
+    setCurrentPage(0);
   };
 
   // 정렬 변경
   const handleSortChange = (sort: IComment.SortKey) => {
-    setQuery((prev) => ({ ...prev, sort, page: 1 }));
-    setCurrentPage(1);
+    setQuery((prev) => ({ ...prev, sort, page: 0 }));
+    setCurrentPage(0);
   };
 
   // 검색 대상 변경
@@ -407,7 +407,7 @@ export default function CommentsManagementPage() {
           <nav className="flex items-center space-x-2">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              disabled={currentPage === 0}
               className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -421,7 +421,7 @@ export default function CommentsManagementPage() {
 
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               const pageNum =
-                Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                Math.max(0, Math.min(totalPages - 4, currentPage - 2)) + i;
               return (
                 <button
                   key={pageNum}
@@ -432,14 +432,14 @@ export default function CommentsManagementPage() {
                       : "border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500"
                   }`}
                 >
-                  {pageNum}
+                  {pageNum + 1}
                 </button>
               );
             })}
 
             <button
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages - 1}
               className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
