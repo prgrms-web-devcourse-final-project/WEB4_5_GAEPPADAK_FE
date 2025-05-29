@@ -90,15 +90,15 @@ export default function MembersManagementPage() {
   // 역할별 색상
   const getRoleColor = (role: IMember.roleType) => {
     return role === "ADMIN"
-      ? "text-blue-600 bg-blue-100"
-      : "text-gray-600 bg-gray-100";
+      ? "text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30"
+      : "text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-700";
   };
 
   // 차단 상태별 색상
   const getBlockColor = (blockType: IMember.blockType) => {
     return blockType === "BLACK"
-      ? "text-red-600 bg-red-100"
-      : "text-green-600 bg-green-100";
+      ? "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30"
+      : "text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30";
   };
 
   return (
