@@ -212,6 +212,7 @@ export default function PostsManagementPage() {
     const statusMap: { [key: string]: string } = {
       PENDING: "대기중",
       APPROVED: "승인됨",
+      ACCEPTED: "승인됨",
       REJECTED: "거부됨",
     };
     return statusMap[status] || status;
@@ -223,6 +224,7 @@ export default function PostsManagementPage() {
       case "PENDING":
         return "text-yellow-600 bg-yellow-100";
       case "APPROVED":
+      case "ACCEPTED":
         return "text-green-600 bg-green-100";
       case "REJECTED":
         return "text-red-600 bg-red-100";
