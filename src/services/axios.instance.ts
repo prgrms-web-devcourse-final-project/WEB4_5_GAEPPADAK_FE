@@ -42,7 +42,11 @@ axiosInstance.interceptors.response.use(
       }
 
       // "로그인 상태가 아닙니다." 메시지인 경우 로그인 프롬프트 모달 표시
-      if (errorMessage === "로그인 상태가 아닙니다.") {
+      // 단, getMe API 요청은 제외
+      if (
+        errorMessage === "로그인 상태가 아닙니다." &&
+        !originalRequest.url?.includes("api/v1/members/me")
+      ) {
         loginPromptManager.showLoginPrompt();
       }
     }
