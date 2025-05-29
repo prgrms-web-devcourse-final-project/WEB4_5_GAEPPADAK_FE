@@ -376,7 +376,12 @@ export default function CommentsManagementPage() {
                       {getReportReasonText(comment.reportReason)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      {new Date(comment.reportedAt).toLocaleDateString()}
+                      {new Date(
+                        new Date(comment.reportedAt).getTime() +
+                          9 * 60 * 60 * 1000
+                      ).toLocaleDateString("ko-KR", {
+                        timeZone: "Asia/Seoul",
+                      })}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
                       {comment.reportCount}
