@@ -205,12 +205,13 @@ export default function MembersManagementPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(member.role)}`}
-                        >
-                          {getRoleText(member.role)}
-                        </span>
-                        {member.role === "USER" && (
+                        {member.role === "ADMIN" ? (
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(member.role)}`}
+                          >
+                            {getRoleText(member.role)}
+                          </span>
+                        ) : (
                           <select
                             value={member.blockType || "USER"}
                             onChange={(e) =>
@@ -219,16 +220,15 @@ export default function MembersManagementPage() {
                                 e.target.value as IMember.blockType
                               )
                             }
-                            className="text-xs border border-gray-500 rounded px-2 py-1 bg-gray-600 text-white cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              member.blockType === "BLACK"
+                                ? "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30"
+                                : "text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30"
+                            }`}
                           >
-                            <option value="USER">정상</option>
-                            <option value="BLACK">차단</option>
+                            <option value="USER">유저</option>
+                            <option value="BLACK">블랙</option>
                           </select>
-                        )}
-                        {member.role === "ADMIN" && (
-                          <span className="text-xs text-gray-400">
-                            변경 불가
-                          </span>
                         )}
                       </div>
                     </td>
