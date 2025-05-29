@@ -158,16 +158,16 @@ export default function MembersManagementPage() {
       {/* 테이블 */}
       <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead className="bg-gray-600 border-b border-gray-500">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   닉네임
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   이메일
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   역할/상태
                 </th>
               </tr>
@@ -194,10 +194,14 @@ export default function MembersManagementPage() {
                 members.map((member) => (
                   <tr key={member.memberId} className="hover:bg-gray-600">
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
-                      {member.nickname}
+                      <div className="max-w-[150px] truncate">
+                        {member.nickname}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      {member.email}
+                      <div className="max-w-[250px] truncate">
+                        {member.email}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">

@@ -297,7 +297,7 @@ export default function CommentsManagementPage() {
       {/* 테이블 */}
       <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[1400px]">
             <thead className="bg-gray-600 border-b border-gray-500">
               <tr>
                 <th className="w-12 px-4 py-3 text-left">
@@ -311,25 +311,25 @@ export default function CommentsManagementPage() {
                     className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   작성자
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   댓글 내용
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   포스트 제목
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   신고 사유
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   최근 신고 날짜
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   신고 횟수
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-100">
                   상태
                 </th>
               </tr>
@@ -364,16 +364,24 @@ export default function CommentsManagementPage() {
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-100 font-medium">
-                      {comment.nickname}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-300 max-w-xs truncate">
-                      {comment.body}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 max-w-xs truncate font-medium">
-                      {comment.title}
+                      <div className="max-w-[120px] truncate">
+                        {comment.nickname}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
-                      {getReportReasonText(comment.reportReason)}
+                      <div className="max-w-[250px] truncate">
+                        {comment.body}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                      <div className="max-w-[200px] truncate">
+                        {comment.title}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-300">
+                      <div className="max-w-[150px] truncate">
+                        {getReportReasonText(comment.reportReason)}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-300">
                       {new Date(
@@ -383,7 +391,7 @@ export default function CommentsManagementPage() {
                         timeZone: "Asia/Seoul",
                       })}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                    <td className="px-4 py-3 text-sm text-gray-100 font-medium text-center">
                       {comment.reportCount}
                     </td>
                     <td className="px-4 py-3">
