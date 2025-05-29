@@ -9,7 +9,13 @@ import { authService } from "@src/services/auth.service";
 import { AxiosError } from "axios";
 
 export default function ProfileEditPage() {
-  const { currentUser, isLoggedIn, logout, loading: userLoading } = useUser();
+  const {
+    currentUser,
+    isLoggedIn,
+    logout,
+    loading: userLoading,
+    refreshUser,
+  } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -217,6 +223,19 @@ export default function ProfileEditPage() {
       }
 
       await authService.patchProfile(updateData);
+
+      // 프로필 업데이트 성공 후 사용자 정보 새로고침
+      await refreshUser();
+
+      // 편집 모드 해제
+      setIsEditing(false);
+
+      // 비밀번호 필드 초기화
+      setFormData((prev) => ({
+        ...prev,
+        newPassword: "",
+        confirmPassword: "",
+      }));
 
       alert("프로필이 성공적으로 업데이트되었습니다.");
       router.push("/main");
