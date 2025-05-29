@@ -128,21 +128,43 @@ export default function PopularVideosPage() {
     }
 
     return (
-      <div className="flex justify-center my-8">
-        <div className="flex items-center">
+      <div className="flex justify-center mt-10 mb-12">
+        <nav className="inline-flex rounded-md shadow-sm -space-x-px overflow-hidden">
+          {/* 이전 페이지 버튼 */}
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className="mx-1"
+            className={`px-3 py-2 ${
+              currentPage === 1
+                ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            } text-sm border border-gray-200 dark:border-gray-700`}
           >
-            ◀
+            <span className="sr-only">이전</span>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
           </button>
 
+          {/* 페이지 버튼들 */}
           {pagesToRender.map((page, index) => {
             if (page === null) {
               // 줄임표 표시
               return (
-                <span key={`ellipsis-${index}`} className="mx-1">
+                <span
+                  key={`ellipsis-${index}`}
+                  className="px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 flex items-center justify-center"
+                >
                   ...
                 </span>
               );
@@ -152,23 +174,45 @@ export default function PopularVideosPage() {
               <button
                 key={`page-${page}`}
                 onClick={() => setCurrentPage(page)}
-                className={`mx-1 ${currentPage === page ? "font-bold" : ""}`}
+                className={`px-4 py-2 ${
+                  currentPage === page
+                    ? "bg-blue-500 text-white dark:bg-blue-600"
+                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                } text-sm border border-gray-200 dark:border-gray-700`}
               >
                 {page}
               </button>
             );
           })}
 
+          {/* 다음 페이지 버튼 */}
           <button
             onClick={() =>
               setCurrentPage(Math.min(totalPages, currentPage + 1))
             }
             disabled={currentPage === totalPages}
-            className="mx-1"
+            className={`px-3 py-2 ${
+              currentPage === totalPages
+                ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            } text-sm border border-gray-200 dark:border-gray-700`}
           >
-            ▶
+            <span className="sr-only">다음</span>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
           </button>
-        </div>
+        </nav>
       </div>
     );
   };
@@ -182,7 +226,7 @@ export default function PopularVideosPage() {
   }
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto px-4 py-6">
       {/* 헤더 영역 */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -241,9 +285,7 @@ export default function PopularVideosPage() {
                       {video.title}
                     </h3>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded-full">
-                        YouTube
-                      </span>
+                      <></>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {formatDate(video.publishedAt)}
                       </span>
