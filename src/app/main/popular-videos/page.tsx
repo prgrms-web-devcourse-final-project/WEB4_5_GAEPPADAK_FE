@@ -284,8 +284,7 @@ export default function PopularVideosPage() {
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {video.title}
                     </h3>
-                    <div className="flex justify-between items-center">
-                      <></>
+                    <div className="flex justify-end items-center">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {formatDate(video.publishedAt)}
                       </span>

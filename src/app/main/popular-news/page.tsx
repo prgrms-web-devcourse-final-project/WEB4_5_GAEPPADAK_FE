@@ -287,7 +287,7 @@ export default function PopularNewsPage() {
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
                       {news.description}
                     </p>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-end items-center">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {news.publishedAt ? formatDate(news.publishedAt) : ""}
                       </span>
