@@ -5,7 +5,6 @@ import NavTab from "@src/components/ui/NavTab";
 import { authService } from "@src/services/auth.service";
 import { useUser } from "@/src/contexts/UserContext";
 import PasswordCheckModal from "@src/components/modals/PasswordCheckModal";
-import ThemeToggle from "@src/components/ThemeToggle";
 
 interface HeaderProps {
   initialActiveTab?: string;
@@ -207,9 +206,6 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* 사용자 메뉴 */}
             <div className="flex items-center space-x-3">
-              {/* 테마 전환 버튼 */}
-              <ThemeToggle />
-
               {loading ? (
                 // 로딩 중일 때는 빈 공간 표시
                 <div className="w-32 h-8"></div>
@@ -217,7 +213,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <>
                   <button
                     onClick={handleLogout}
-                    className="px-4 py-2 rounded-full text-sm text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                    className="px-4 py-2 rounded-full text-sm !text-white bg-blue-600 hover:bg-blue-700 cursor-pointer font-medium border-0 outline-0"
                   >
                     로그아웃
                   </button>
@@ -231,12 +227,12 @@ export const Header: React.FC<HeaderProps> = ({
               ) : (
                 <>
                   <Link href="/auth/signup">
-                    <button className="px-4 py-2 rounded-full text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                    <button className="px-4 py-2 rounded-full text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 font-medium">
                       회원가입
                     </button>
                   </Link>
                   <Link href="/auth/signin">
-                    <button className="px-4 py-2 rounded-full text-sm text-white bg-blue-600 hover:bg-blue-700">
+                    <button className="px-4 py-2 rounded-full text-sm !text-white bg-blue-600 hover:bg-blue-700 font-medium border-0 outline-0">
                       로그인
                     </button>
                   </Link>
