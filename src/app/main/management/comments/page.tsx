@@ -46,8 +46,8 @@ export default function CommentsManagementPage() {
   };
 
   // 정렬 변경
-  const handleSortChange = (sort: IComment.SortKey) => {
-    setQuery((prev) => ({ ...prev, sort, page: 0 }));
+  const handleSortChange = (sortField: IComment.SortKey) => {
+    setQuery((prev) => ({ ...prev, sort: sortField, page: 0 }));
     setCurrentPage(0);
   };
 
@@ -262,8 +262,8 @@ export default function CommentsManagementPage() {
               }
               className="border border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-gray-600 text-white"
             >
-              <option value="reportedAt">최근 신고 날짜</option>
-              <option value="reportCount">신고 횟수</option>
+              <option value="reportedAt,DESC">최근 신고 날짜</option>
+              <option value="reportCount,DESC">신고 횟수</option>
             </select>
           </div>
         </div>
