@@ -50,7 +50,7 @@ export namespace IPost {
     etcReason?: string;
   }
 
-  export type SortKey = "reportedAt" | "reportCount";
+  export type SortKey = "reportedAt,DESC" | "reportCount,DESC";
 
   export type SearchTarget =
     | "post_title"
@@ -63,7 +63,7 @@ export namespace IPost {
 
     size: number = 10;
 
-    sort: SortKey = "reportedAt";
+    sort: SortKey = "reportedAt,DESC";
 
     searchTarget: SearchTarget = "post_title";
 

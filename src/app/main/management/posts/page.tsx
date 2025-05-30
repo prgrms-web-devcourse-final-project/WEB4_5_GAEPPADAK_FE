@@ -14,7 +14,7 @@ export default function PostsManagementPage() {
   const [query, setQuery] = useState<IPost.GetListQueryDtoForAdmin>({
     page: 0,
     size: 10,
-    sort: "reportedAt",
+    sort: "reportedAt,DESC",
     searchTarget: "post_title",
     searchValue: "",
   });
