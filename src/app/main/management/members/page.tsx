@@ -103,14 +103,16 @@ export default function MembersManagementPage() {
 
   return (
     <div className="p-6 min-h-screen">
-      <h1 className="text-2xl font-bold text-white mb-6">회원 리스트</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        회원 리스트
+      </h1>
 
       {/* 검색 영역 */}
-      <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 p-4 mb-6">
+      <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 mb-6">
         <div className="flex gap-4 items-end">
           {/* 검색 대상 선택 */}
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               검색 대상
             </label>
             <select
@@ -122,7 +124,7 @@ export default function MembersManagementPage() {
                     .value as IMember.GetListQueryDtoForAdmin["searchTarget"],
                 }))
               }
-              className="border border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-gray-600 text-white"
+              className="border border-gray-300 dark:border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
             >
               <option value="nickname">닉네임</option>
               <option value="email">이메일</option>
@@ -132,7 +134,7 @@ export default function MembersManagementPage() {
 
           {/* 검색어 입력 */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               검색어
             </label>
             <div className="flex">
@@ -141,7 +143,7 @@ export default function MembersManagementPage() {
                 value={query.searchValue || ""}
                 onChange={(e) => handleSearchValueChange(e.target.value)}
                 placeholder="검색어를 입력하세요"
-                className="flex-1 border border-gray-500 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 text-white placeholder-gray-300"
+                className="flex-1 border border-gray-300 dark:border-gray-500 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-300"
                 onKeyPress={(e) => e.key === "Enter" && handleSearch()}
               />
               <button
@@ -156,23 +158,23 @@ export default function MembersManagementPage() {
       </div>
 
       {/* 테이블 */}
-      <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 overflow-hidden">
+      <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[800px]">
-            <thead className="bg-gray-600 border-b border-gray-500">
+            <thead className="bg-gray-50 dark:bg-gray-600 border-b border-gray-200 dark:border-gray-500">
               <tr>
-                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   닉네임
                 </th>
-                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   이메일
                 </th>
-                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   역할/상태
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-600">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
               {loading ? (
                 <tr>
                   <td colSpan={3} className="px-4 py-8 text-center">
@@ -185,20 +187,23 @@ export default function MembersManagementPage() {
                 <tr>
                   <td
                     colSpan={3}
-                    className="px-4 py-8 text-center text-gray-300"
+                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-300"
                   >
                     회원이 없습니다.
                   </td>
                 </tr>
               ) : (
                 members.map((member) => (
-                  <tr key={member.memberId} className="hover:bg-gray-600">
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                  <tr
+                    key={member.memberId}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
                       <div className="max-w-[150px] truncate">
                         {member.nickname}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                       <div className="max-w-[250px] truncate">
                         {member.email}
                       </div>
@@ -253,7 +258,7 @@ export default function MembersManagementPage() {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 0}
-              className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="p-2 rounded-md border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -274,7 +279,7 @@ export default function MembersManagementPage() {
                   className={`px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${
                     currentPage === pageNum
                       ? "bg-blue-600 text-white"
-                      : "border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500"
+                      : "border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500"
                   }`}
                 >
                   {pageNum + 1}
@@ -285,7 +290,7 @@ export default function MembersManagementPage() {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages - 1}
-              className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="p-2 rounded-md border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path

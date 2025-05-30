@@ -201,14 +201,16 @@ export default function CommentsManagementPage() {
 
   return (
     <div className="p-6 min-h-screen">
-      <h1 className="text-2xl font-bold text-white mb-6">댓글 관리</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        댓글 관리
+      </h1>
 
       {/* 검색 및 필터 영역 */}
-      <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 p-4 mb-6">
+      <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 mb-6">
         <div className="flex flex-wrap gap-4 items-end">
           {/* 검색 대상 선택 */}
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               검색 대상
             </label>
             <select
@@ -218,7 +220,7 @@ export default function CommentsManagementPage() {
                   e.target.value as IComment.SearchTarget
                 )
               }
-              className="border border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-gray-600 text-white"
+              className="border border-gray-300 dark:border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
             >
               <option value="nickname">작성자</option>
               <option value="post_title">포스트 제목</option>
@@ -229,7 +231,7 @@ export default function CommentsManagementPage() {
 
           {/* 검색어 입력 */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               검색어
             </label>
             <div className="flex">
@@ -238,7 +240,7 @@ export default function CommentsManagementPage() {
                 value={query.searchValue || ""}
                 onChange={(e) => handleSearchValueChange(e.target.value)}
                 placeholder="검색어를 입력하세요"
-                className="flex-1 border border-gray-500 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 text-white placeholder-gray-300"
+                className="flex-1 border border-gray-300 dark:border-gray-500 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-300"
                 onKeyPress={(e) => e.key === "Enter" && handleSearch()}
               />
               <button
@@ -252,7 +254,7 @@ export default function CommentsManagementPage() {
 
           {/* 정렬 선택 */}
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               정렬
             </label>
             <select
@@ -260,7 +262,7 @@ export default function CommentsManagementPage() {
               onChange={(e) =>
                 handleSortChange(e.target.value as IComment.SortKey)
               }
-              className="border border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-gray-600 text-white"
+              className="border border-gray-300 dark:border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
             >
               <option value="reportedAt,DESC">최근 신고 날짜</option>
               <option value="reportCount,DESC">신고 횟수</option>
@@ -271,9 +273,9 @@ export default function CommentsManagementPage() {
 
       {/* 일괄 처리 버튼 */}
       {selectedComments.size > 0 && (
-        <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 p-4 mb-6">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 mb-6">
           <div className="flex items-center justify-between">
-            <span className="text-gray-200 text-sm">
+            <span className="text-gray-700 dark:text-gray-200 text-sm">
               {selectedComments.size}개 댓글 선택됨
             </span>
             <div className="flex gap-2">
@@ -297,10 +299,10 @@ export default function CommentsManagementPage() {
       )}
 
       {/* 테이블 */}
-      <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 overflow-hidden">
+      <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1400px]">
-            <thead className="bg-gray-600 border-b border-gray-500">
+            <thead className="bg-gray-50 dark:bg-gray-600 border-b border-gray-200 dark:border-gray-500">
               <tr>
                 <th className="w-12 px-4 py-3 text-left">
                   <input
@@ -310,33 +312,33 @@ export default function CommentsManagementPage() {
                       selectedComments.size === comments.length
                     }
                     onChange={handleSelectAll}
-                    className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="rounded border-gray-300 dark:border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
                 </th>
-                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   작성자
                 </th>
-                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   댓글 내용
                 </th>
-                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   포스트 제목
                 </th>
-                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   신고 사유
                 </th>
-                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   최근 신고 날짜
                 </th>
-                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   신고 횟수
                 </th>
-                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   상태
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-600">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
               {loading ? (
                 <tr>
                   <td colSpan={8} className="px-4 py-8 text-center">
@@ -349,43 +351,46 @@ export default function CommentsManagementPage() {
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-4 py-8 text-center text-gray-300"
+                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-300"
                   >
                     신고된 댓글이 없습니다.
                   </td>
                 </tr>
               ) : (
                 comments.map((comment) => (
-                  <tr key={comment.commentId} className="hover:bg-gray-600">
+                  <tr
+                    key={comment.commentId}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
                         checked={selectedComments.has(comment.commentId)}
                         onChange={() => handleSelectComment(comment.commentId)}
-                        className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        className="rounded border-gray-300 dark:border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                       />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
                       <div className="max-w-[120px] truncate">
                         {comment.nickname}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                       <div className="max-w-[250px] truncate">
                         {comment.body}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
                       <div className="max-w-[200px] truncate">
                         {comment.title}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                       <div className="max-w-[150px] truncate">
                         {getReportReasonText(comment.reportReason)}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                       {new Date(
                         new Date(comment.reportedAt).getTime() +
                           9 * 60 * 60 * 1000
@@ -393,7 +398,7 @@ export default function CommentsManagementPage() {
                         timeZone: "Asia/Seoul",
                       })}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium text-center">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium text-center">
                       {comment.reportCount}
                     </td>
                     <td className="px-4 py-3">
@@ -418,7 +423,7 @@ export default function CommentsManagementPage() {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 0}
-              className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="p-2 rounded-md border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -439,7 +444,7 @@ export default function CommentsManagementPage() {
                   className={`px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${
                     currentPage === pageNum
                       ? "bg-blue-600 text-white"
-                      : "border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500"
+                      : "border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500"
                   }`}
                 >
                   {pageNum + 1}
@@ -450,7 +455,7 @@ export default function CommentsManagementPage() {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages - 1}
-              className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="p-2 rounded-md border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path

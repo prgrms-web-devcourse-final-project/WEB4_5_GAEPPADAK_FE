@@ -235,14 +235,16 @@ export default function PostsManagementPage() {
 
   return (
     <div className="p-6 min-h-screen">
-      <h1 className="text-2xl font-bold text-white mb-6">게시글 관리</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        게시글 관리
+      </h1>
 
       {/* 검색 및 필터 영역 */}
-      <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 p-4 mb-6">
+      <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 mb-6">
         <div className="flex flex-wrap gap-4 items-end">
           {/* 검색 대상 선택 */}
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               검색 대상
             </label>
             <select
@@ -250,7 +252,7 @@ export default function PostsManagementPage() {
               onChange={(e) =>
                 handleSearchTargetChange(e.target.value as IPost.SearchTarget)
               }
-              className="border border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-gray-600 text-white"
+              className="border border-gray-300 dark:border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
             >
               <option value="post_title">포스트 제목</option>
               <option value="post_summary">포스트 내용</option>
@@ -261,7 +263,7 @@ export default function PostsManagementPage() {
 
           {/* 검색어 입력 */}
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               검색어
             </label>
             <div className="flex">
@@ -270,7 +272,7 @@ export default function PostsManagementPage() {
                 value={query.searchValue || ""}
                 onChange={(e) => handleSearchValueChange(e.target.value)}
                 placeholder="검색어를 입력하세요"
-                className="flex-1 border border-gray-500 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 text-white placeholder-gray-300"
+                className="flex-1 border border-gray-300 dark:border-gray-500 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-300"
                 onKeyPress={(e) => e.key === "Enter" && handleSearch()}
               />
               <button
@@ -284,7 +286,7 @@ export default function PostsManagementPage() {
 
           {/* 정렬 선택 */}
           <div>
-            <label className="block text-sm font-medium text-gray-200 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
               정렬
             </label>
             <select
@@ -292,7 +294,7 @@ export default function PostsManagementPage() {
               onChange={(e) =>
                 handleSortChange(e.target.value as IPost.SortKey)
               }
-              className="border border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-gray-600 text-white"
+              className="border border-gray-300 dark:border-gray-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-white dark:bg-gray-600 text-gray-900 dark:text-white"
             >
               <option value="reportedAt,DESC">최근 신고 날짜</option>
               <option value="reportCount,DESC">신고 횟수</option>
@@ -303,9 +305,9 @@ export default function PostsManagementPage() {
 
       {/* 일괄 처리 버튼 */}
       {selectedPosts.size > 0 && (
-        <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 p-4 mb-6">
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-4 mb-6">
           <div className="flex items-center justify-between">
-            <span className="text-gray-200 text-sm">
+            <span className="text-gray-700 dark:text-gray-200 text-sm">
               {selectedPosts.size}개 게시글 선택됨
             </span>
             <div className="flex gap-2">
@@ -329,10 +331,10 @@ export default function PostsManagementPage() {
       )}
 
       {/* 테이블 */}
-      <div className="bg-gray-700 rounded-lg shadow-sm border border-gray-600 overflow-hidden">
+      <div className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1200px]">
-            <thead className="bg-gray-600 border-b border-gray-500">
+            <thead className="bg-gray-50 dark:bg-gray-600 border-b border-gray-200 dark:border-gray-500">
               <tr>
                 <th className="w-12 px-4 py-3 text-left">
                   <input
@@ -341,33 +343,33 @@ export default function PostsManagementPage() {
                       posts.length > 0 && selectedPosts.size === posts.length
                     }
                     onChange={handleSelectAll}
-                    className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className="rounded border-gray-300 dark:border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
                 </th>
-                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[200px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   포스트 제목
                 </th>
-                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[250px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   포스트 내용
                 </th>
-                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   키워드
                 </th>
-                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[150px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   신고 사유
                 </th>
-                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[120px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   최근 신고 날짜
                 </th>
-                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   신고 횟수
                 </th>
-                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-100">
+                <th className="min-w-[100px] px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100">
                   상태
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-600">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
               {loading ? (
                 <tr>
                   <td colSpan={8} className="px-4 py-8 text-center">
@@ -380,44 +382,47 @@ export default function PostsManagementPage() {
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-4 py-8 text-center text-gray-300"
+                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-300"
                   >
                     신고된 게시글이 없습니다.
                   </td>
                 </tr>
               ) : (
                 posts.map((post) => (
-                  <tr key={post.postId} className="hover:bg-gray-600">
+                  <tr
+                    key={post.postId}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
                     <td className="px-4 py-3">
                       <input
                         type="checkbox"
                         checked={selectedPosts.has(post.postId)}
                         onChange={() => handleSelectPost(post.postId)}
-                        className="rounded border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        className="rounded border-gray-300 dark:border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer"
                       />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
                       <div className="max-w-[200px] truncate">{post.title}</div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                       <div className="max-w-[250px] truncate">
                         {post.summary}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium">
                       <div className="max-w-[120px] truncate">
                         {post.keyword}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                       <div className="max-w-[150px] truncate">
                         {getReportReasonText(post.reportReason)}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-300">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
                       {new Date(post.reportedAt).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-100 font-medium text-center">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 font-medium text-center">
                       {post.reportCount}
                     </td>
                     <td className="px-4 py-3">
@@ -442,7 +447,7 @@ export default function PostsManagementPage() {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 0}
-              className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="p-2 rounded-md border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -463,7 +468,7 @@ export default function PostsManagementPage() {
                   className={`px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${
                     currentPage === pageNum
                       ? "bg-blue-600 text-white"
-                      : "border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500"
+                      : "border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500"
                   }`}
                 >
                   {pageNum + 1}
@@ -474,7 +479,7 @@ export default function PostsManagementPage() {
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages - 1}
-              className="p-2 rounded-md border border-gray-500 bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="p-2 rounded-md border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
