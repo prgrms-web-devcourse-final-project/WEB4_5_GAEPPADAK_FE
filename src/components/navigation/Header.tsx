@@ -5,6 +5,7 @@ import NavTab from "@src/components/ui/NavTab";
 import { authService } from "@src/services/auth.service";
 import { useUser } from "@/src/contexts/UserContext";
 import PasswordCheckModal from "@src/components/modals/PasswordCheckModal";
+import ThemeToggle from "@src/components/ThemeToggle";
 
 interface HeaderProps {
   initialActiveTab?: string;
@@ -144,25 +145,25 @@ export const Header: React.FC<HeaderProps> = ({
 
                 {/* 드롭다운 메뉴 */}
                 {showManagementDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-10">
                     <div className="py-2">
                       <Link
                         href="/main/management/posts"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer"
                         onClick={() => setShowManagementDropdown(false)}
                       >
                         포스트
                       </Link>
                       <Link
                         href="/main/management/comments"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer"
                         onClick={() => setShowManagementDropdown(false)}
                       >
                         댓글
                       </Link>
                       <Link
                         href="/main/management/members"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer"
                         onClick={() => setShowManagementDropdown(false)}
                       >
                         회원
@@ -206,6 +207,9 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* 사용자 메뉴 */}
             <div className="flex items-center space-x-3">
+              {/* 테마 전환 버튼 */}
+              <ThemeToggle />
+
               {loading ? (
                 // 로딩 중일 때는 빈 공간 표시
                 <div className="w-32 h-8"></div>
