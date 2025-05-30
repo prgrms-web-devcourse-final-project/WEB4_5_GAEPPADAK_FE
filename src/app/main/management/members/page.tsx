@@ -213,7 +213,9 @@ export default function MembersManagementPage() {
                           </span>
                         ) : (
                           <select
-                            value={member.blockType || "USER"}
+                            value={
+                              member.blockType === "BLACK" ? "BLACK" : "USER"
+                            }
                             onChange={(e) =>
                               handleRoleChange(
                                 member.memberId,
