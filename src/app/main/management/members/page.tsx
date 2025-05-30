@@ -214,7 +214,10 @@ export default function MembersManagementPage() {
                         ) : (
                           <select
                             value={
-                              member.blockType === "BLACK" ? "BLACK" : "USER"
+                              member.blockType === "BLACK" ||
+                              String(member.role) === "BLACK"
+                                ? "BLACK"
+                                : "USER"
                             }
                             onChange={(e) =>
                               handleRoleChange(
@@ -223,7 +226,8 @@ export default function MembersManagementPage() {
                               )
                             }
                             className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                              member.blockType === "BLACK"
+                              member.blockType === "BLACK" ||
+                              String(member.role) === "BLACK"
                                 ? "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30"
                                 : "text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30"
                             }`}
